@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Google Analytics -->
+  <script>
+    // Logic derived from https://stackoverflow.com/a/61839170
+    const local = (function (hostname=window.location.hostname) {
+      return (
+        (['localhost', '127.0.0.1', '', '::1'].includes(hostname))
+        || (hostname.startsWith('192.168.'))
+        || (hostname.startsWith('10.'))
+      )
+    })();
+    if (!local) {
+      const script = document.createElement("script");
+      script.async = true;
+      script.src = "https://www.googletagmanager.com/gtag/js?id=G-C2ELSYY9VC";
+      document.head.appendChild(script);
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+  
+      gtag('config', 'G-C2ELSYY9VC');
+    }
+  </script>
+  
+  <script>
+    // webgl detection block
+    function isWebGL2Enabled() {
+      // It doesn't seem like there's a better way to do this than just to try and get a context
+      // https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/By_example/Detect_WebGL
+      // NB: The engine specifically wants a webgl2 context
+      const canvas = document.createElement("canvas");
+      const gl = canvas.getContext("webgl2");
+      return gl instanceof WebGL2RenderingContext;
+    }
+
+    // read by WebGlTest.vue; nothing is blocked from loading here
+    window.showWebGL2Warning = !isWebGL2Enabled();
+  </script>
+
+  <!-- Declared here once for the whole app rather than in MainComponent's stylesheet, since
+       component stylesheets are unscoped and this avoids re-declaring it if that content ever
+       splits across files. Served as woff2 - 17kB, against 55kB as TrueType - with the .ttf
+       original kept as a fallback src. Not preloaded: fetching it up front only pushes the app
+       bundle back, and `font-display: swap` keeps text readable in a fallback face until it lands. -->
+  <style>@font-face{font-family:Highway Gothic Narrow;src:url(./fonts/HighwayGothicNarrow.woff2)format("woff2"),url(./fonts/HighwayGothicNarrow.ttf)format("truetype");font-display:swap}</style>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://projects.cosmicds.cfa.harvard.edu/vue-ds-template/">
+  <meta property="og:title" content="CosmicDS Vue template">
+  <meta property="og:description" content="CosmicDS Vue template">
+  <meta property="og:site_name" content="CosmicDS Vue template">
+  <meta property="og:image" content="https://projects.cosmicds.cfa.harvard.edu/vue-ds-template/preview.png">
+  <meta property="og:image:secure_url" content="https://projects.cosmicds.cfa.harvard.edu/vue-ds-template/preview.png">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="596">
+  <meta property="og:image:height" content="886">
+  <meta property="og:image:alt" content="Story preview image">
+  <meta name="twitter:site" content="@CosmicDataStory">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@CosmicDataStory">
+  <meta name="twitter:image" content="https://projects.cosmicds.cfa.harvard.edu/vue-ds-template/preview.png">
+  <link rel="icon" href="https://projects.cosmicds.cfa.harvard.edu/cds-website/cosmicds-favicon.png">
+  <link rel="apple-touch-icon" href="https://projects.cosmicds.cfa.harvard.edu/cds-website/cosmicds-favicon-57.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="https://projects.cosmicds.cfa.harvard.edu/cds-website/cosmicds-favicon-72.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="https://projects.cosmicds.cfa.harvard.edu/cds-website/cosmicds-favicon-114.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="https://projects.cosmicds.cfa.harvard.edu/cds-website/cosmicds-favicon-144.png">
+  <link rel="shortcut icon" href="https://projects.cosmicds.cfa.harvard.edu/cds-website/cosmicds-favicon.ico">
+  <meta name="apple-mobile-web-app-title" content="CosmicDS Vue template">
+  <link rel="manifest" href="site.webmanifest">
+  <title>CosmicDS Vue template</title>
+  <script type="module" crossorigin src="./assets/index-BXB24ynn.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-CjB5_Sof.css">
+</head>
+
+<body>
+  <noscript>
+    <strong>This page requires JavaScript to run.</strong>
+  </noscript>
+  <div id="app-mount"></div>
+</body>
+
+</html>
