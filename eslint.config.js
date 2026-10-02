@@ -136,6 +136,12 @@ export default typescriptEslint.config(
       "vuejs-accessibility/media-has-caption": "off",
       // this probably is a good rule to have, but too strict for a starter template
       "vuejs-accessibility/tabindex-no-positive": "off",
+      "vuejs-accessibility/label-has-for": ["error", 
+        { 
+          required: { some: ["nesting", "id"] },
+          allowChildren: true,
+        }],
+
     }
   }
 

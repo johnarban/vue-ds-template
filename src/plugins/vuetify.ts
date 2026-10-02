@@ -6,6 +6,8 @@ import { createVuetify } from "vuetify";
 //import * as components from 'vuetify/components';
 //import * as directives from 'vuetify/directives';
 
+// For help makeing simple themes, see https://theme.oliverrr.net/config
+
 // Translations provided by Vuetify
 import { en } from "vuetify/locale";
 

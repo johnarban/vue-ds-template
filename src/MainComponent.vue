@@ -73,7 +73,7 @@
           <div id="center-buttons"></div>
           <div id="right-buttons"></div>
         </div>
-
+        <ElementTestPage />
         <div id="bottom-content">
           <!-- credit logos id=logo-credits -->
           <credit-logos
@@ -166,6 +166,7 @@ import {
   useWWTKeyboardControls,
   IconButton,
   CreditLogos,
+  
 } from "@cosmicds/vue-toolkit";
 import SplashScreen from "./components/SplashScreen.vue";
 import VideoWrapper from "./components/VideoWrapper.vue";
@@ -175,6 +176,7 @@ import InformationSheet from "./components/InformationSheet.vue";
 import InfoPage from "./components/InfoPage.vue";
 import UserGuide from "./components/UserGuide.vue";
 import { useAppLayout } from "./composables/useAppLayout";
+import ElementTestPage from "./components/ElementTestPage.vue";
 
 const extraLogos = [
   {
@@ -291,22 +293,13 @@ function closeSplashScreen() {
 
 <style lang="less">
 @import url(@/css/universal.css);
+@import url(@/css/focus-visible.less);
 :root {
   --default-font-size: clamp(0.7rem, 1.7vmin, 1.1rem);
   --default-line-height: clamp(1rem, 2.2vmin, 1.6rem);
 }
 
-// based on Sara Soueidan (https://www.sarasoueidan.com/blog/focus-indicators/) & Erik Kroes (https://www.erikkroes.nl/blog/the-universal-focus-state/)
-:focus-visible:not(.v-btn):not(.v-field):not(.v-input) {
-  // outline: 4px double white;
-  // box-shadow: 0 0 0 2px black;
-  outline: none; /* outline needs to be none to override the broswer */
-  box-shadow:
-    inset 0 0 0 2px white,
-    0 0 0 3px #0b5cb3,
-    0 0 0 5px white;
-  border-radius: 0.125rem;
-}
+
 
 html {
   height: 100%;
