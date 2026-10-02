@@ -8,6 +8,7 @@
     color="var(--info-sheet-bg)"
     :style="cssVars"
     height="100%"
+    tabindex="-1"
   >
     <!-- Vuetify gives the unselected tab tabindex="-1" (the ARIA roving-tabindex
          pattern, where arrow keys move between tabs) but its own arrow handling

@@ -57,6 +57,7 @@
               :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
               tooltip-location="start"
               size="lg"
+              focus-element="#side-panel-sheet-h"
             >
             </icon-button>
             <icon-button
@@ -112,6 +113,7 @@
         closable: (default: true) show the close button
       -->
       <information-sheet
+        id="side-panel-sheet"
         v-model="showTextSheet"
         v-model:tab="infoSheetTab"
         :tab-color="accentColor"
