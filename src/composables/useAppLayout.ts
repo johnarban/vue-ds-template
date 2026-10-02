@@ -1,5 +1,6 @@
 import { computed } from "vue";
 import { useDisplay } from "vuetify";
+import { supportsTouchscreen } from "@cosmicds/vue-toolkit";
 
 let layout: ReturnType<typeof createAppLayout> | null = null;
 
@@ -14,6 +15,7 @@ function createAppLayout() {
   const sidePanel = computed(() => isLandscape.value || (!smallSize.value && !isVertical.value));
   // a phone. Not `smallSize`, which reaches to 960.
   const isMobile = computed(() => xs.value);
+  const touchscreen = supportsTouchscreen();
 
   return {
     viewportWidth,
@@ -22,6 +24,7 @@ function createAppLayout() {
     isLandscape,
     sidePanel,
     isMobile,
+    touchscreen,
   };
 }
 
