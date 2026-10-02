@@ -62,3 +62,33 @@ yarn unlink ../vue-toolkit
 ```
 
 you can do `yarn link -r` if you want relative paths
+
+
+
+
+## Questions and Issues
+ - Icon-Button - hidden to the user that the id they assing is not really. we shouldn't define an id by default, just let the user, it's too important
+ - 
+ 
+ 
+ 
+ <v-icon> needs @click and @keyup.enter
+ <v-btn> provides the @keyup with the @click
+ 
+ 
+ - try icon-button as a button
+ 
+ 
+- make a docs page with our example
+ - showing a WTML
+ - show some catalog
+ - basic manipulation of ImageSetLayers
+ 
+ 
+ only some elements are focusable by default, everything else needs to be a tabindex -1 at least
+ 
+ use tabindex -1 for programmatically focusable items, that are not reachable by keyboard
+ 
+so vuetify internally handles applying refocusing dialog activators. 
+if you put something in the activator slots, or assign the activator prop to an id, 
+that thing will get focus after the dialog closes

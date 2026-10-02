@@ -7,17 +7,11 @@
     close-on-content-click
   >
     <div class="video-wrapper">
-      <font-awesome-icon
+      <CloseButton
         id="video-close-icon"
-        class="fa-close-icon"
-        icon="times"
-        size="lg"
-        tabindex="0"
-        aria-hidden="false"
-        aria-label="Close Video"
+        label="Close Video"
         @click="showVideoSheet = false"
-        @keyup.enter="showVideoSheet = false"
-      ></font-awesome-icon>
+      />
 
       <iframe
         v-if="youtubeSrc"
@@ -45,6 +39,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
+import CloseButton from "./CloseButton.vue";
 
 interface VideoProps {
   /** the URL of a video file (mp4, webm, ...).  */

@@ -63,14 +63,10 @@
             />
           </div>
         </div>
-        <font-awesome-icon
-          class="splash-close-button fa-close-icon"
-          icon="xmark"
-          tabindex="0"
-          aria-hidden="false"
-          aria-label="Close Splash Screen"
+        <CloseButton
+          class="splash-close-button"
+          label="Close Splash Screen"
           @click="closeSplashScreen"
-          @keyup.enter="closeSplashScreen"
         />
       </div>
     </focus-trap>
@@ -81,6 +77,7 @@
 import { computed } from "vue";
 import { FocusTrap } from "focus-trap-vue";
 import { CreditLogos } from "@cosmicds/vue-toolkit";
+import CloseButton from "./CloseButton.vue";
 
 const cfaExtraLogo = [
   {

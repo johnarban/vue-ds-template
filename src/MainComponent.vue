@@ -50,6 +50,7 @@
              it uses slotted styles so it's specificiy is (0,2,0)
               -->
             <icon-button
+              id="show-info"
               v-model="showTextSheet"
               icon="question"
               :ariaLabel="showTextSheet ? 'Hide Info' : 'Learn More'"
@@ -70,11 +71,35 @@
               size="lg"
             >
             </icon-button>
+            <icon-button
+              
+              v-model="showSampleDialog"
+              icon="lightbulb"
+              ariaLabel="Show Sample Dialog"
+              :color="accentColor"
+              tooltip-text="Show Sample Dialog"
+              tooltip-location="start"
+              size="lg"
+            >
+            </icon-button>
+            <!-- 10 x 10 div -->
+            <div 
+              id="show-sample-dialog" 
+              style="width: 10px; height: 10px; background-color: red;" 
+              tabindex="0"
+            ></div>
+            <ClosableDialog
+              activator="#show-sample-dialog"
+              max-width="500"
+              title="Lorem Ipsum"
+            >
+              Lorem ipsum dolor sit, amet consectetur adipisicing elit. Dolorem rem fuga veniam quia ut voluptas deserunt, fugiat repellendus repudiandae quod debitis provident, quas ratione, totam molestias perferendis fugit maiores id.
+            </ClosableDialog>
           </div>
           <div id="center-buttons"></div>
           <div id="right-buttons"></div>
         </div>
-        <ElementTestPage />
+
         <div id="bottom-content">
           <!-- credit logos id=logo-credits -->
           <credit-logos
@@ -133,7 +158,6 @@
         <!-- 
         Example of an Info Page with a stable footer and scrollable upper section. 
         -->
-        <!--
         <info-page title="Example" name="example">
           <div class="ip-example-header">[Optional] This will stay at the top</div>
           <div class="flex-grow-1 overflow-y-auto my-5 bg-red">
@@ -144,7 +168,6 @@
           </div>
           <div class="ip-example-footer">This will stay at the bottom</div>
         </info-page>
-        -->
 
         <!-- the user guide is an <InfoPage title="User Guide" value="user-guide>...</InfoPage>"
          it can be userful to move complex content into a separate component
@@ -178,8 +201,7 @@ import InformationSheet from "./components/InformationSheet.vue";
 import InfoPage from "./components/InfoPage.vue";
 import UserGuide from "./components/UserGuide.vue";
 import { useAppLayout } from "./composables/useAppLayout";
-import ElementTestPage from "./components/ElementTestPage.vue";
-
+import ClosableDialog from "./components/ClosableDialog.vue";
 const extraLogos = [
   {
     src: "./CfA_Logo_Vertical_Reverse.png",
@@ -215,6 +237,7 @@ const showSplashScreen = ref(splash);
 const backgroundImagesets = reactive<BackgroundImageset[]>([]);
 
 const showVideo = ref(false);
+const showSampleDialog = ref(false);
 
 const showWebGL2Warning = ref(false);
 
@@ -283,6 +306,9 @@ function openInfoSheetTab(tabValue: string) {
   infoSheetTab.value = tabValue;
   showTextSheet.value = true;
 }
+
+// import { useFocusOnClose } from "@/a11y";
+// useFocusOnClose(showTextSheet, "#show-info-button", { focusVisible: true });
 
 /**
   This is convenient if there's any other logic that we want to run
@@ -424,8 +450,8 @@ body {
 }
 
 .icon-wrapper {
-  // give us circles.
-  border-radius: 50% !important;
+  // hack so that non-square icons don't look like ovals
+  border-radius: 99999px !important;
   aspect-ratio: 1/1;
   // even padding
   padding: 8px !important;

@@ -3,7 +3,6 @@
   <!-- the vars go on the root so the tabs, the close icon and every InfoPage
        inherit the same set -->
   <v-card
-    v-if="showTextSheet"
     class="cds-info-sheet"
     color="var(--info-sheet-bg)"
     :style="cssVars"
@@ -54,18 +53,12 @@
       style="height: 36px"
     ></div>
 
-    <font-awesome-icon
+    <CloseButton
       v-if="closable"
       id="close-text-icon"
-      class="fa-close-icon"
-      icon="times"
-      size="lg"
-      tabindex="0"
-      aria-hidden="false"
-      aria-label="Close Information Sheet"
+      label="Close Information Sheet"
       @click="handleClose"
-      @keyup.enter="handleClose"
-    ></font-awesome-icon>
+    />
     <!-- Information Content -->
     <!-- mandatory for the same same reason  -->
     <v-window
@@ -119,6 +112,7 @@ export interface Props {
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from "vue";
 import { provide, readonly } from "vue";
+import CloseButton from "./CloseButton.vue";
 
 const props = withDefaults(defineProps<Props>(), {
   closable: true,
