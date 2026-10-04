@@ -50,10 +50,9 @@
              it uses slotted styles so it's specificiy is (0,2,0)
               -->
             <icon-button
-              id="show-info"
               v-model="showTextSheet"
               icon="question"
-              :ariaLabel="showTextSheet ? 'Hide Info' : 'Learn More'"
+              :aria-label="showTextSheet ? 'Hide Info' : 'Learn More'"
               :color="accentColor"
               :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
               tooltip-location="start"
@@ -63,7 +62,7 @@
             <icon-button
               v-model="showVideo"
               icon="video"
-              ariaLabel="Watch video"
+              aria-label="Watch video"
               :color="accentColor"
               tooltip-text="Watch video"
               tooltip-location="start"
@@ -73,7 +72,6 @@
             <ClosableDialog max-width="500" title="Lorem Ipsum">
               <template #activator="{ props }">
                 <icon-button
-                  id="show-sample-dialog"
                   icon="lightbulb"
                   aria-label="Show Sample Dialog"
                   :color="accentColor"

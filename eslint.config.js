@@ -117,8 +117,7 @@ export default typescriptEslint.config(
       'vue/no-v-html': 'off',
       'vue/multiline-html-element-content-newline': 'off',
       'vue/singleline-html-element-content-newline': 'off',
-      // ariaLabel has to stay camelCase - kebab-case doesn't type-check against icon-button's prop
-      'vue/attribute-hyphenation': ['error', 'always', { ignore: ['ariaLabel'] }],
+      'vue/attribute-hyphenation': ['error', 'always'],
     },
   },
   
@@ -136,11 +135,16 @@ export default typescriptEslint.config(
       "vuejs-accessibility/media-has-caption": "off",
       // this probably is a good rule to have, but too strict for a starter template
       "vuejs-accessibility/tabindex-no-positive": "off",
-      "vuejs-accessibility/label-has-for": ["error", 
-        { 
+      "vuejs-accessibility/label-has-for": ["error",
+        {
           required: { some: ["nesting", "id"] },
           allowChildren: true,
         }],
+      // check IconButton/icon-button to enforce aria-labels on them. 
+      // Adding an "id" will let it pass, but this is the best we can do right now
+      "vuejs-accessibility/form-control-has-label": ["error", {
+        controlComponents: ["icon-button", "IconButton"],
+      }],
 
     }
   }
