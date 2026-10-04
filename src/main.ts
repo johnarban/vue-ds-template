@@ -33,6 +33,7 @@ library.add(faSignsPost);
 library.add(faHouse);
 
 import hide from "./directives/hide";
+import focusReturn from "./directives/focusReturn";
 createApp(MainComponent, {
   wwtNamespace: "vue-ds-template",
 })
@@ -45,6 +46,7 @@ createApp(MainComponent, {
 
   // Directives
   .directive( "hide", hide)
+  .directive("focus-return", focusReturn)
 
   // Mount
   .mount("#app-mount");

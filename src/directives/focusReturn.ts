@@ -1,0 +1,68 @@
+/**
+ * Custom directives
+ * https://vuejs.org/guide/typescript/composition-api#typing-global-custom-directives
+ * https://vuejs.org/guide/reusability/custom-directives.html#directive-hooks
+ *
+ * Hints:
+ *  - Put the JSDoc comments in the module declaration for it to show up in the template
+ *  - Put the JSDoc comments above the `export default` for it to show up where the directive is imported
+ *
+ */
+
+import type { Directive } from 'vue';
+
+
+export type FocusReturnDirective = Directive<HTMLElement, boolean>;
+
+declare module 'vue' {
+    export interface GlobalDirectives {
+        /**
+         * :v-focus-return=\<boolean\>
+         *
+         * Focuses the element when the bound value becomes true. When it
+         * becomes false, returns focus to whatever was focused beforehand -
+         * works regardless of what that was, so any kind of opener is fine.
+        */
+        vFocusReturn: FocusReturnDirective
+    }
+}
+
+/** the WeakMap persists, but key elements can be garbage-collected so they don't build up when no longer relevant */
+const previouslyFocused = new WeakMap<HTMLElement, HTMLElement | null>();
+
+function activate(el: HTMLElement) {
+  previouslyFocused.set(el, document.activeElement as HTMLElement | null);
+  el.focus();
+}
+
+function deactivate(el: HTMLElement) {
+  previouslyFocused.get(el)?.focus();
+}
+
+/**
+ * :v-focus-return=\<boolean\>
+ *
+ * Focuses the element when the bound value becomes true. When it becomes
+ * false, returns focus to whatever was focused beforehand - works
+ * regardless of what that was, so any kind of opener is fine.
+*/
+export default {
+  // the element may be v-if'd in already active (e.g. default true)
+  mounted: (el, binding) => {
+    if (binding.value) activate(el);
+  },
+  updated: (el, binding) => {
+    // if the element is newly visible, focus itself
+    if (binding.value && !binding.oldValue) {
+      activate(el);
+    }
+    // if the element is newly hidden, return focus to the originator
+    if (!binding.value && binding.oldValue) {
+      deactivate(el);
+    }
+  },
+  // the element may be v-if'd away while still active
+  unmounted: (el, binding) => {
+    if (binding.value) deactivate(el);
+  },
+} satisfies FocusReturnDirective;
