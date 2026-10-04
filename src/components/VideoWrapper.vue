@@ -6,7 +6,11 @@
     fullscreen
     close-on-content-click
   >
-    <div class="video-wrapper">
+    <div
+      v-focus-return="showVideoSheet"
+      class="video-wrapper"
+      tabindex="-1"
+    >
       <CloseButton
         id="video-close-icon"
         label="Close Video"
