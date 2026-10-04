@@ -58,7 +58,6 @@
               :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
               tooltip-location="start"
               size="lg"
-              focus-element="#side-panel-sheet-h"
             >
             </icon-button>
             <icon-button
@@ -71,28 +70,16 @@
               size="lg"
             >
             </icon-button>
-            <icon-button
-              
-              v-model="showSampleDialog"
-              icon="lightbulb"
-              ariaLabel="Show Sample Dialog"
-              :color="accentColor"
-              tooltip-text="Show Sample Dialog"
-              tooltip-location="start"
-              size="lg"
-            >
-            </icon-button>
-            <!-- 10 x 10 div -->
-            <div 
-              id="show-sample-dialog" 
-              style="width: 10px; height: 10px; background-color: red;" 
-              tabindex="0"
-            ></div>
-            <ClosableDialog
-              activator="#show-sample-dialog"
-              max-width="500"
-              title="Lorem Ipsum"
-            >
+            <ClosableDialog max-width="500" title="Lorem Ipsum">
+              <template #activator="{ props }">
+                <icon-button
+                  id="show-sample-dialog"
+                  icon="lightbulb"
+                  aria-label="Show Sample Dialog"
+                  :color="accentColor"
+                  :activator-props="props"
+                />
+              </template>
               Lorem ipsum dolor sit, amet consectetur adipisicing elit. Dolorem rem fuga veniam quia ut voluptas deserunt, fugiat repellendus repudiandae quod debitis provident, quas ratione, totam molestias perferendis fugit maiores id.
             </ClosableDialog>
           </div>
@@ -141,6 +128,7 @@
         id="side-panel-sheet"
         v-model="showTextSheet"
         v-model:tab="infoSheetTab"
+        v-focus-return="showTextSheet"
         :tab-color="accentColor"
         :slider-color="accentColor"
         :accent-color="accentColor"
@@ -237,7 +225,6 @@ const showSplashScreen = ref(splash);
 const backgroundImagesets = reactive<BackgroundImageset[]>([]);
 
 const showVideo = ref(false);
-const showSampleDialog = ref(false);
 
 const showWebGL2Warning = ref(false);
 
@@ -306,9 +293,6 @@ function openInfoSheetTab(tabValue: string) {
   infoSheetTab.value = tabValue;
   showTextSheet.value = true;
 }
-
-// import { useFocusOnClose } from "@/a11y";
-// useFocusOnClose(showTextSheet, "#show-info-button", { focusVisible: true });
 
 /**
   This is convenient if there's any other logic that we want to run
