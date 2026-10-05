@@ -117,7 +117,7 @@ const cssVars = computed(() => {
     ...props.cssVars,
     "--accent-color": props.color,
     "--background-image": props.backgroundImage ? `url("${props.backgroundImage}")` : "none",
-    "--background-opacity": props.backgroundImage ? 1 : 0.5,
+    "--background-opacity": props.backgroundImage ? 1 : 0.8,
   };
 });
 
