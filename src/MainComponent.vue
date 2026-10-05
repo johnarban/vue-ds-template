@@ -86,11 +86,19 @@
         </div>
 
         <div id="bottom-content">
+          <!-- example: crossfade between the Hubble and JWST views of the Carina Nebula -->
+          <ImageCrossfadeSlider
+            v-if="hubbleLayer && jwstCarina.imagesetLayer"
+            :left="hubbleLayer"
+            :right="jwstCarina.imagesetLayer"
+            left-label="Hubble"
+            right-label="Webb"
+          />
           <!-- credit logos id=logo-credits -->
           <credit-logos
             v-if="!xs"
             :default-logos="['cosmicds', 'wwt', 'nasa']"
-            :logo-size="xs ? '2em' : '2.5em'"
+            :logo-size="xs ? '1.5em' : '2em'"
             :extra-logos="extraLogos"
           />
         </div>
@@ -168,7 +176,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ref, reactive, computed, onMounted, watch } from "vue";
 import type { StyleValue } from "vue";
-import { WWTControl, Coordinates } from "@wwtelescope/engine";
+import { WWTControl, Coordinates, type ImageSetLayer } from "@wwtelescope/engine";
 import { D2R } from "@wwtelescope/astro";
 import { GotoRADecZoomParams, WWTComponent as WorldWideTelescope, engineStore } from "@wwtelescope/engine-pinia";
 import {
@@ -188,6 +196,8 @@ import InfoPage from "./components/InfoPage.vue";
 import UserGuide from "./components/UserGuide.vue";
 import { useAppLayout } from "./composables/useAppLayout";
 import ClosableDialog from "./components/ClosableDialog.vue";
+import { useWtmlLoader } from "./composables/useWtmlLoader";
+import ImageCrossfadeSlider from "./components/ImageCrossfadeSlider.vue";
 const extraLogos = [
   {
     src: "./CfA_Logo_Vertical_Reverse.png",
@@ -225,6 +235,22 @@ const backgroundImagesets = reactive<BackgroundImageset[]>([]);
 const showVideo = ref(false);
 
 const showWebGL2Warning = ref(false);
+
+/* Two different ways of doing the same thing. 
+ */
+const hubbleLayer = ref<ImageSetLayer | null>(null);
+
+useWtmlLoader("https://web.wwtassets.org/specials/2023/cosmicds-carina/collection/carina_nebula.wtml", {
+  goTo: true,
+  instant: true,
+  onLoad: (out) => {
+    hubbleLayer.value = out.layer;
+  },
+});
+const jwstCarina = useWtmlLoader("https://web.wwtassets.org/specials/2023/cosmicds-carina/collection/jwst_carina.wtml", {
+  single: true,
+  goTo: false,
+});
 
 import { useTheme, useDisplay } from "vuetify";
 const theme = useTheme();
@@ -421,7 +447,7 @@ body {
   width: 100%;
   pointer-events: auto;
   align-items: flex-end;
-  gap: 5px;
+  gap: 1rem;
 
   // neither #logo-credits nor #icons-container are flex
   #logo-credits > #icons-container {
