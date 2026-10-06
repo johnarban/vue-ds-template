@@ -31,7 +31,6 @@
       -->
     <VideoWrapper
       v-model="showVideo"
-      video-src="./test-video-vertical.mp4"
     />
 
     <!-- privacy setup -->
