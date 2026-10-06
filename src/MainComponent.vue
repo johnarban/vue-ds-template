@@ -320,7 +320,7 @@ withDefaults(defineProps<MainComponentProps>(), {
 });
 
 const GALACTIC_CENTER = Coordinates.galactictoJ2000(0, 0);
-const initialCameraParams = {
+const _initialCameraParams = {
   raRad: GALACTIC_CENTER[0] * D2R,
   decRad: GALACTIC_CENTER[1] * D2R,
   zoomDeg: 360,
@@ -338,7 +338,7 @@ const showWebGL2Warning = ref(false);
 const hubbleLayer = ref<ImageSetLayer | null>(null);
 
 useWtmlLoader("https://web.wwtassets.org/specials/2023/cosmicds-carina/collection/carina_nebula.wtml", {
-  goTo: true,
+  goTo: false,
   instant: true,
   onLoad: (out) => {
     hubbleLayer.value = out.layer;
@@ -407,6 +407,15 @@ interface TourStepContent extends BaseTourStepContent {
   // add any additional properties you want to use in your tour steps here
 }
 const tour = useTour<TourStepContent>({
+  /**
+   * The first tour step contains a move. In this example file,
+   * we had a move to the galactic center at startup and we had an
+   * imageset layer that we goto. So tour step 1 got clobbered.
+   * You either need to remove those early ones, or else make sure
+   * tour.goToStep(0) get's called after everything is done. but be careful,
+   * putting it in closeSplashScreen only works if the splash screen is shown.
+   * 
+   */
   steps: [
     {
       id: "crab",
@@ -421,13 +430,13 @@ const tour = useTour<TourStepContent>({
       },
     },
     {
-      id: "orion",
-      title: "Orion Nebula",
-      text: ["Here's the Orion Nebula!"],
+      id: "carina",
+      title: "Carina Nebula",
+      text: ["Here's the Carina Nebula! Use the slider to crossfade between Hubble and Webb images."],
       setup: async () => {
         store.waitForReady().then(() => {
           store.gotoRADecZoom({
-            raRad: 83.8221 * D2R, decRad: -5.3911 * D2R, zoomDeg: 1, instant: true,
+            raRad: 159.230 * D2R, decRad: -58.650 * D2R, zoomDeg: 0.211, rollRad: 103.075 * D2R, instant: true,
           });
         });
       },
@@ -439,6 +448,10 @@ const tour = useTour<TourStepContent>({
     }
   ],
 });
+
+function startTour() {
+  showTour.value = true;
+}
 
 
 const backgroundItems = ref<{ title: string; value: string }[]>([]);
@@ -456,12 +469,11 @@ onMounted(() => {
   }
 
   store.waitForReady().then(async () => {
-    store
-      .gotoRADecZoom({
-        ...initialCameraParams,
-        instant: true,
-      })
-      .then(() => (positionSet.value = true));
+    // store.gotoRADecZoom({
+    //   ..._initialCameraParams,
+    //   instant: true,
+    // }).then(() => (positionSet.value = true));
+    positionSet.value = true;
 
     // If there are layers to set up, do that here!
     layersLoaded.value = true;
@@ -518,6 +530,7 @@ watch(showUserGuideSheet, (newVal) => {
   }
 });
 
+
 /**
   This is convenient if there's any other logic that we want to run
   when the splash screen is closed
@@ -527,7 +540,7 @@ function closeSplashScreen() {
   // has the user responsed the opt out, then show the privacy dialog
   // pass `true` to only show it once per session, even if the user does not respond (for example if it shows up after an intro sequence)
   conditionalShowPrivacyDialog();
-  showTour.value = true;
+  startTour();
 }
 
 // don't allow showTour and showTextSheet to be true at the same time
@@ -796,7 +809,7 @@ The default DOM structure is basically
 */
 .floating-tour.tour-text {
   position: fixed;
-  bottom: 1rem;
+  bottom: 7rem;
   left: 1rem;
   width: 34%;
   max-width: 500px;
