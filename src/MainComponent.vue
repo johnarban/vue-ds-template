@@ -34,6 +34,13 @@
       video-src="./test-video-vertical.mp4"
     />
 
+    <!-- privacy setup -->
+    <DataCollectionOptOutDialog
+      v-model:show="showPrivacyDialog"
+      v-model:show-privacy-policy="showPrivacyPolicyInfo"
+      v-model:response-opt-out="responseOptOut"
+    />
+    <CDSPrivacyPolicy v-model="showPrivacyPolicyInfo" />
 
     <div id="main-content">
       <WorldWideTelescope :wwt-namespace="wwtNamespace"></WorldWideTelescope>
@@ -86,6 +93,25 @@
         </div>
 
         <div id="bottom-content">
+          <!-- even though this is absolutely positioned, 
+           we place it in the flow so that tabbing hits this before the credit logos -->
+          <div
+            v-show="!showPrivacyDialog"
+            id="privacy-lock"
+          >
+            <icon-button
+              icon="mdi-lock"
+              aria-label="Change privacy settings"
+              :color="accentColor"
+              :border="false"
+              size="0.5em"
+              tooltip-text="Change privacy settings"
+              :show-tooltip="!xs"
+              tooltip-location="start"
+              tooltip-offset="5px"
+              @activate="showPrivacyDialog = true"
+            ></icon-button>
+          </div>
           <!-- example: crossfade between the Hubble and JWST views of the Carina Nebula -->
           <ImageCrossfadeSlider
             v-if="hubbleLayer && jwstCarina.imagesetLayer"
@@ -174,7 +200,7 @@
 
 <script setup lang="ts">
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { ref, reactive, computed, onMounted, watch } from "vue";
+import { ref, reactive, computed, onMounted, watch, nextTick } from "vue";
 import type { StyleValue } from "vue";
 import { WWTControl, Coordinates, type ImageSetLayer } from "@wwtelescope/engine";
 import { D2R } from "@wwtelescope/astro";
@@ -185,7 +211,6 @@ import {
   useWWTKeyboardControls,
   IconButton,
   CreditLogos,
-  
 } from "@cosmicds/vue-toolkit";
 import SplashScreen from "./components/SplashScreen.vue";
 import VideoWrapper from "./components/VideoWrapper.vue";
@@ -198,6 +223,8 @@ import { useAppLayout } from "./composables/useAppLayout";
 import ClosableDialog from "./components/ClosableDialog.vue";
 import { useWtmlLoader } from "./composables/useWtmlLoader";
 import ImageCrossfadeSlider from "./components/ImageCrossfadeSlider.vue";
+
+
 const extraLogos = [
   {
     src: "./CfA_Logo_Vertical_Reverse.png",
@@ -262,6 +289,41 @@ const accentColor2 = computed(() => theme.current.value.colors.secondary);
 
 const { xs } = useDisplay();
 
+import DataCollectionOptOutDialog from "./privacy/DataCollectionOptOutDialog.vue";
+import CDSPrivacyPolicy from "./privacy/CDSPrivacyPolicy.vue";
+import { usePrivacy } from "./privacy/usePrivacy";
+
+// TODO: Suggestion: off-load this to another file
+/** app tracking setup */
+const STORY_NAME = "vue-ds-template" as const;
+let appStartTimestamp = Date.now();
+
+function resetTrackingData() {
+  appStartTimestamp = Date.now();
+}
+
+function getTrackingData() {
+  return {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    app_time_ms: Date.now() - appStartTimestamp,
+  };
+}
+
+const {
+  createUserEntry,
+  responseOptOut,
+  showPrivacyDialog,
+  showPrivacyPolicyInfo,
+  conditionalShowPrivacyDialog,
+} = usePrivacy({
+  optOutKey: `${STORY_NAME}:optOut`,
+  userIDKey: `${STORY_NAME}:userID`,
+  storyPath: `/${STORY_NAME}`,
+  resetData: resetTrackingData,
+  getData: getTrackingData,
+});
+
+
 onMounted(() => {
   if (showWebGL2Warning.value) {
     showSplashScreen.value = false;
@@ -281,6 +343,8 @@ onMounted(() => {
 
     // If there are layers to set up, do that here!
     layersLoaded.value = true;
+
+    createUserEntry();
   });
 });
 
@@ -324,6 +388,9 @@ function openInfoSheetTab(tabValue: string) {
 */
 function closeSplashScreen() {
   showSplashScreen.value = false;
+  // has the user responsed the opt out, then show the privacy dialog
+  // pass `true` to only show it once per session, even if the user does not respond (for example if it shows up after an intro sequence)
+  conditionalShowPrivacyDialog();
 }
 </script>
 
@@ -553,4 +620,19 @@ The default DOM structure is basically
   display: flex;
   flex-direction: column;
 }
+
+/* Small and quiet in the corner, clearing #logo-credits in the same corner
+   (same bottom offset the dialog above uses — the two never show at once).
+   Absolute, so the overlay's flex column still distributes only top and
+   bottom content. */
+#privacy-lock {
+  position: absolute;
+  left: 1rem;
+  bottom: 1rem;
+  pointer-events: none;
+  .icon-wrapper {
+    background-color: rgba(0,0,0, 0.6);
+  }
+}
+
 </style>
