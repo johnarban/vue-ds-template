@@ -778,7 +778,7 @@ body {
 .floating-tour.tour-text {
   position: fixed;
   --horizontal-offset: 1rem;
-  --vertical-offset: 1rem;
+  --vertical-offset: 7rem;
   bottom: var(--vertical-offset);
   left: var(--horizontal-offset);
   width: 30vw;
