@@ -85,17 +85,6 @@
               size="lg"
             >
             </icon-button>
-            <ClosableDialog max-width="500" title="Lorem Ipsum">
-              <template #activator="{ props }">
-                <icon-button
-                  icon="lightbulb"
-                  aria-label="Show Sample Dialog"
-                  :color="accentColor"
-                  :activator-props="props"
-                />
-              </template>
-              Lorem ipsum dolor sit, amet consectetur adipisicing elit. Dolorem rem fuga veniam quia ut voluptas deserunt, fugiat repellendus repudiandae quod debitis provident, quas ratione, totam molestias perferendis fugit maiores id.
-            </ClosableDialog>
             <icon-button
               v-model="showTour"
               icon="signs-post"
@@ -107,7 +96,31 @@
             />
           </div>
           <div id="center-buttons"></div>
-          <div id="right-buttons"></div>
+          <div id="right-buttons">
+            <ClosableDialog
+              max-width="400"
+              title="Settings"
+            >
+              <template #activator="{ props }">
+                <icon-button
+                  icon="image"
+                  aria-label="Settings"
+                  :color="accentColor"
+                  tooltip-text="Settings"
+                  tooltip-location="start"
+                  size="lg"
+                  :activator-props="props"
+                />
+              </template>
+              <v-select
+                v-model="backgroundImagesetName"
+                :items="backgroundItems"
+                label="Background imagery"
+                variant="outlined"
+                density="compact"
+              />
+            </ClosableDialog>
+          </div>
         </div>
 
         <div id="bottom-content">
@@ -262,11 +275,10 @@
 import { ref, reactive, computed, onMounted, watch, nextTick } from "vue";
 import type { StyleValue } from "vue";
 import { WWTControl, Coordinates, type ImageSetLayer } from "@wwtelescope/engine";
+import { ImageSetType, ProjectionType } from "@wwtelescope/engine-types";
 import { D2R } from "@wwtelescope/astro";
 import { GotoRADecZoomParams, WWTComponent as WorldWideTelescope, engineStore } from "@wwtelescope/engine-pinia";
 import {
-  BackgroundImageset,
-  skyBackgroundImagesets,
   useWWTKeyboardControls,
   IconButton,
   CreditLogos,
@@ -316,7 +328,6 @@ const initialCameraParams = {
 
 const splash = new URLSearchParams(window.location.search).get("splash")?.toLowerCase() !== "false";
 const showSplashScreen = ref(splash);
-const backgroundImagesets = reactive<BackgroundImageset[]>([]);
 
 const showVideo = ref(false);
 
@@ -429,7 +440,12 @@ const tour = useTour<TourStepContent>({
   ],
 });
 
-console.log("tour", tour);
+
+const backgroundItems = ref<{ title: string; value: string }[]>([]);
+const backgroundImagesetName = computed({
+  get: () => store.backgroundImageset?.get_name(),
+  set: (name: string) => store.setBackgroundImageByName(name),
+});
 
 onMounted(() => {
   if (showWebGL2Warning.value) {
@@ -440,7 +456,6 @@ onMounted(() => {
   }
 
   store.waitForReady().then(async () => {
-    skyBackgroundImagesets.forEach((iset) => backgroundImagesets.push(iset));
     store
       .gotoRADecZoom({
         ...initialCameraParams,
@@ -450,6 +465,11 @@ onMounted(() => {
 
     // If there are layers to set up, do that here!
     layersLoaded.value = true;
+      
+    // grab all the all-sky (TOAST-projected) images
+    backgroundItems.value = WWTControl.getImageSets()
+      .filter((iset) => iset.get_dataSetType() === ImageSetType.sky && iset.get_projection() === ProjectionType.toast)
+      .map((iset) => ({ title: iset.get_name(), value: iset.get_name() }));
 
     createUserEntry();
   });
