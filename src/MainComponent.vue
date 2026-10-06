@@ -41,7 +41,7 @@
       v-model:response-opt-out="responseOptOut"
     />
     <CDSPrivacyPolicy v-model="showPrivacyPolicyInfo" />
-
+    
     <div id="main-content">
       <WorldWideTelescope :wwt-namespace="wwtNamespace"></WorldWideTelescope>
       <wwt-loader v-model="isLoading" />
@@ -87,6 +87,15 @@
               </template>
               Lorem ipsum dolor sit, amet consectetur adipisicing elit. Dolorem rem fuga veniam quia ut voluptas deserunt, fugiat repellendus repudiandae quod debitis provident, quas ratione, totam molestias perferendis fugit maiores id.
             </ClosableDialog>
+            <icon-button
+              v-model="showTour"
+              icon="signs-post"
+              aria-label="Show Tour"
+              :color="accentColor"
+              tooltip-text="Show Tour"
+              tooltip-location="start"
+              size="lg"
+            />
           </div>
           <div id="center-buttons"></div>
           <div id="right-buttons"></div>
@@ -136,6 +145,18 @@
     It's an in-flow flex sibling of #main-content, so opening it shrinks the WWT view
     (from the side normally, from the bottom on small screens) instead of covering it.
   -->
+    
+    <!-- The tour sheet is effecively a flex-box and 
+    doesn't actually need the SideDrawer wrapper, it will
+    naturally follow the layout of the app. The SideDrawer
+    gives us more contol and a floating layout
+    -->
+    <TourSheet
+      v-if="showTour"
+      :class="{'floating-tour': true}"
+      :tour="tour"
+      :small-size="false"
+    />
 
     <div
       v-show="!showSplashScreen"
@@ -223,7 +244,6 @@ import { useAppLayout } from "./composables/useAppLayout";
 import ClosableDialog from "./components/ClosableDialog.vue";
 import { useWtmlLoader } from "./composables/useWtmlLoader";
 import ImageCrossfadeSlider from "./components/ImageCrossfadeSlider.vue";
-
 
 const extraLogos = [
   {
@@ -324,6 +344,54 @@ const {
 });
 
 
+const showTour = ref(false);
+
+import {
+  TourSheet,
+  useTour,
+  type BaseTourStepContent,
+} from  "@cosmicds/vue-toolkit";
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+interface TourStepContent extends BaseTourStepContent {
+  // add any additional properties you want to use in your tour steps here
+}
+const tour = useTour<TourStepContent>({
+  steps: [
+    {
+      id: "crab",
+      title: "Crab Nebula",
+      text: ["Here's the Crab Nebula!"],
+      setup: async () => {
+        store.waitForReady().then(() => {
+          store.gotoRADecZoom({
+            raRad: 83.6331 * D2R, decRad: 22.0145 * D2R, zoomDeg: 1, instant: true,
+          });
+        });
+      },
+    },
+    {
+      id: "orion",
+      title: "Orion Nebula",
+      text: ["Here's the Orion Nebula!"],
+      setup: async () => {
+        store.waitForReady().then(() => {
+          store.gotoRADecZoom({
+            raRad: 83.8221 * D2R, decRad: -5.3911 * D2R, zoomDeg: 1, instant: true,
+          });
+        });
+      },
+    },
+    {
+      id: "end",
+      title: "The End",
+      text: ["That's all folks!"],
+    }
+  ],
+});
+
+console.log("tour", tour);
+
 onMounted(() => {
   if (showWebGL2Warning.value) {
     showSplashScreen.value = false;
@@ -391,7 +459,20 @@ function closeSplashScreen() {
   // has the user responsed the opt out, then show the privacy dialog
   // pass `true` to only show it once per session, even if the user does not respond (for example if it shows up after an intro sequence)
   conditionalShowPrivacyDialog();
+  showTour.value = true;
 }
+
+// don't allow showTour and showTextSheet to be true at the same time
+watch(showTour, (newVal) => {
+  if (newVal) {
+    showTextSheet.value = false;
+  }
+});
+watch(showTextSheet, (newVal) => {
+  if (newVal) {
+    showTour.value = false;
+  }
+});
 </script>
 
 <style lang="less">
@@ -635,4 +716,17 @@ The default DOM structure is basically
   }
 }
 
+/* make the tour float. This means pulling it of the
+  flex layout and giving it a fixed position. 
+*/
+.floating-tour.tour-text {
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+  width: 34%;
+  max-width: 500px;
+  min-height: 0;
+  max-height: 400px;
+  z-index: 1000;
+}
 </style>
