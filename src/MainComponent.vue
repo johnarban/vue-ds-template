@@ -2,7 +2,7 @@
   <v-app
     id="app"
     :style="cssVars"
-    :class="[smallSize ? 'app-is-small' : '', sidePanel ? 'app-side-panel' : '']"
+    :class="smallSize ? 'app-is-small' : ''"
   >
     <webgl-test @webgl2-disabled="showWebGL2Warning = true" />
     
@@ -41,126 +41,128 @@
     />
     <CDSPrivacyPolicy v-model="showPrivacyPolicyInfo" />
     
-    <div id="main-content">
-      <WorldWideTelescope :wwt-namespace="wwtNamespace"></WorldWideTelescope>
-      <wwt-loader v-model="isLoading" />
+    <v-main>
+      <div id="main-content">
+        <WorldWideTelescope :wwt-namespace="wwtNamespace"></WorldWideTelescope>
+        <wwt-loader v-model="isLoading" />
 
-      <!-- This block contains the elements (e.g. icon buttons displayed at/near the top of the screen) -->
+        <!-- This block contains the elements (e.g. icon buttons displayed at/near the top of the screen) -->
 
-      <div v-show="!showSplashScreen" id="wwt-overlay">
+        <div v-show="!showSplashScreen" id="wwt-overlay">
         
-        <div id="top-content">
-          <div id="left-buttons">
-            <!-- icon-buttons default to size="1em"
+          <div id="top-content">
+            <div id="left-buttons">
+              <!-- icon-buttons default to size="1em"
              id's and classes will be added to the .icon-wrapper
              it uses slotted styles so it's specificiy is (0,2,0)
               -->
-            <icon-button
-              v-model="showTextSheet"
-              icon="book-open"
-              :aria-label="showTextSheet ? 'Hide Info' : 'Learn More'"
-              :color="accentColor"
-              :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
-              tooltip-location="start"
-              size="lg"
-            >
-            </icon-button>
-            <icon-button
-              v-model="showUserGuideSheet"
-              icon="question"
-              aria-label="User guide"
-              :color="accentColor"
-              tooltip-text="User guide"
-              tooltip-location="start"
-              size="lg"
-            />
-
-            <icon-button
-              v-model="showVideo"
-              icon="video"
-              aria-label="Watch video"
-              :color="accentColor"
-              tooltip-text="Watch video"
-              tooltip-location="start"
-              size="lg"
-            >
-            </icon-button>
-            <icon-button
-              v-model="showTour"
-              icon="signs-post"
-              aria-label="Show Tour"
-              :color="accentColor"
-              tooltip-text="Show Tour"
-              tooltip-location="start"
-              size="lg"
-            />
-          </div>
-          <div id="center-buttons"></div>
-          <div id="right-buttons">
-            <ClosableDialog
-              max-width="400"
-              title="Settings"
-            >
-              <template #activator="{ props }">
-                <icon-button
-                  icon="image"
-                  aria-label="Settings"
-                  :color="accentColor"
-                  tooltip-text="Settings"
-                  tooltip-location="start"
-                  size="lg"
-                  :activator-props="props"
-                />
-              </template>
-              <v-select
-                v-model="backgroundImagesetName"
-                :items="backgroundItems"
-                label="Background imagery"
-                variant="outlined"
-                density="compact"
+              <icon-button
+                v-model="showTextSheet"
+                icon="book-open"
+                :aria-label="showTextSheet ? 'Hide Info' : 'Learn More'"
+                :color="accentColor"
+                :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
+                tooltip-location="start"
+                size="lg"
+              >
+              </icon-button>
+              <icon-button
+                v-model="showUserGuideSheet"
+                icon="question"
+                aria-label="User guide"
+                :color="accentColor"
+                tooltip-text="User guide"
+                tooltip-location="start"
+                size="lg"
               />
-            </ClosableDialog>
-          </div>
-        </div>
 
-        <div id="bottom-content">
-          <!-- even though this is absolutely positioned, 
-           we place it in the flow so that tabbing hits this before the credit logos -->
-          <div
-            v-show="!showPrivacyDialog"
-            id="privacy-lock"
-          >
-            <icon-button
-              icon="mdi-lock"
-              aria-label="Change privacy settings"
-              :color="accentColor"
-              :border="false"
-              size="0.5em"
-              tooltip-text="Change privacy settings"
-              :show-tooltip="!xs"
-              tooltip-location="start"
-              tooltip-offset="5px"
-              @activate="showPrivacyDialog = true"
-            ></icon-button>
+              <icon-button
+                v-model="showVideo"
+                icon="video"
+                aria-label="Watch video"
+                :color="accentColor"
+                tooltip-text="Watch video"
+                tooltip-location="start"
+                size="lg"
+              >
+              </icon-button>
+              <icon-button
+                v-model="showTour"
+                icon="signs-post"
+                aria-label="Show Tour"
+                :color="accentColor"
+                tooltip-text="Show Tour"
+                tooltip-location="start"
+                size="lg"
+              />
+            </div>
+            <div id="center-buttons"></div>
+            <div id="right-buttons">
+              <ClosableDialog
+                max-width="400"
+                title="Settings"
+              >
+                <template #activator="{ props }">
+                  <icon-button
+                    icon="image"
+                    aria-label="Settings"
+                    :color="accentColor"
+                    tooltip-text="Settings"
+                    tooltip-location="start"
+                    size="lg"
+                    :activator-props="props"
+                  />
+                </template>
+                <v-select
+                  v-model="backgroundImagesetName"
+                  :items="backgroundItems"
+                  label="Background imagery"
+                  variant="outlined"
+                  density="compact"
+                />
+              </ClosableDialog>
+            </div>
           </div>
-          <!-- example: crossfade between the Hubble and JWST views of the Carina Nebula -->
-          <ImageCrossfadeSlider
-            v-if="hubbleLayer && jwstCarina.imagesetLayer"
-            :left="hubbleLayer"
-            :right="jwstCarina.imagesetLayer"
-            left-label="Hubble"
-            right-label="Webb"
-          />
-          <!-- credit logos id=logo-credits -->
-          <credit-logos
-            v-if="!xs"
-            :default-logos="['cosmicds', 'wwt', 'nasa']"
-            :logo-size="xs ? '1.5em' : '2em'"
-            :extra-logos="extraLogos"
-          />
+
+          <div id="bottom-content">
+            <!-- even though this is absolutely positioned, 
+           we place it in the flow so that tabbing hits this before the credit logos -->
+            <div
+              v-show="!showPrivacyDialog"
+              id="privacy-lock"
+            >
+              <icon-button
+                icon="mdi-lock"
+                aria-label="Change privacy settings"
+                :color="accentColor"
+                :border="false"
+                size="0.5em"
+                tooltip-text="Change privacy settings"
+                :show-tooltip="!xs"
+                tooltip-location="start"
+                tooltip-offset="5px"
+                @activate="showPrivacyDialog = true"
+              ></icon-button>
+            </div>
+            <!-- example: crossfade between the Hubble and JWST views of the Carina Nebula -->
+            <ImageCrossfadeSlider
+              v-if="hubbleLayer && jwstCarina.imagesetLayer"
+              :left="hubbleLayer"
+              :right="jwstCarina.imagesetLayer"
+              left-label="Hubble"
+              right-label="Webb"
+            />
+            <!-- credit logos id=logo-credits -->
+            <credit-logos
+              v-if="!xs"
+              :default-logos="['cosmicds', 'wwt', 'nasa']"
+              :logo-size="xs ? '1.5em' : '2em'"
+              :extra-logos="extraLogos"
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </v-main>
 
     <!--
     This contains the informational content that is displayed when the book icon is clicked.
@@ -168,24 +170,29 @@
     (from the side normally, from the bottom on small screens) instead of covering it.
   -->
     
-    <!-- The tour sheet is effecively a flex-box and 
-    doesn't actually need the SideDrawer wrapper, it will
-    naturally follow the layout of the app. The SideDrawer
-    gives us more contol and a floating layout
+    <!-- 
+    the drawer pushes the view rather than covering it  to have it cover the view set temporary=true.
+    By default Vuetify makes the drawer cover the view below a certain window width,
+    no matter what temporary is set to. mobile-breakpoint=0 turns that off, so temporary
+    is always respected.
     -->
-    <TourSheet
-      v-if="showTour"
-      :class="{'floating-tour': true}"
-      :tour="tour"
-      :small-size="false"
-    />
-    
-    <!-- #drawer is providing the positioning in the flex-layout -->
-    <div
-      v-show="!showSplashScreen"
+    <v-navigation-drawer
       id="drawer"
-      :class="[sidePanel ? 'info-side' : 'info-bottom', showTextSheet || showUserGuideSheet ? 'drawer-open' : 'drawer-closed']"
+      :key="sidePanel ? 'side' : 'bottom'"
+      v-model="drawerOpen"
+      :location="sidePanel ? 'start' : 'bottom'"
+      :width="sidePanel ? drawerWidth : undefined"
+      :mobile-breakpoint="0"
+      :class="sidePanel ? 'drawer-side' : 'drawer-bottom'"
+      :temporary="false"
     >
+      <TourSheet
+        v-if="showTour"
+        :class="{'floating-tour': false}"
+        :tour="tour"
+        :small-size="false"
+      />
+
       <!--
         The Tabbed Sheet and TabPage are vue "tightly coupled" components
         This means a TabPage can only be used within an TabbedSheet.
@@ -266,7 +273,7 @@
           <user-guide />
         </div>
       </v-sheet>
-    </div>
+    </v-navigation-drawer>
   </v-app>
 </template>
 
@@ -313,7 +320,8 @@ const store = engineStore();
 
 useWWTKeyboardControls(store);
 
-const { smallSize, sidePanel } = useAppLayout();
+const { smallSize, sidePanel, viewportWidth } = useAppLayout();
+const drawerWidth = computed(() => Math.round(viewportWidth.value * 0.34));
 
 withDefaults(defineProps<MainComponentProps>(), {
   wwtNamespace: "vue-ds-template",
@@ -523,6 +531,17 @@ function openInfoSheetTab(tabValue: string) {
   showUserGuideSheet.value = false;
 }
 const showUserGuideSheet = ref(false);
+
+const drawerOpen = computed({
+  get: () => !showSplashScreen.value && (showTextSheet.value || showUserGuideSheet.value || showTour.value),
+  set: (open: boolean) => {
+    if (!open) {
+      showTextSheet.value = false;
+      showUserGuideSheet.value = false;
+      showTour.value = false;
+    }
+  },
+});
 // we dont want both open at the same time
 watch(showUserGuideSheet, (newVal) => {
   if (newVal) {
@@ -599,13 +618,11 @@ body {
 }
 
 #main-content {
-  // containing block for the absolutely positioned WWT host and overlay
+  // containing block for the absolutely positioned WWT host and overlay.
+  // v-main sizes this to the space the drawer leaves free.
   position: relative;
-  display: block;
-  // shrinkable with no min-size floor, so an open drawer takes its share of the space
-  flex: 1 1 auto;
-  min-width: 0;
-  min-height: 0;
+  height: 100%;
+  width: 100%;
   overflow: hidden;
 }
 
@@ -706,71 +723,17 @@ body {
   color: rgba(var(--v-theme-primary), 1) !important;
 }
 
-/** ====== Define our standard Side/Bottom panel layout
-The default DOM structure is basically
-<div #app>
-  <div .v-application__wrap>
-    <div #main-content>
-      <WorldWideTelescope />
-      <div #wwt-overlay />
-    </div>
-    <div #drawer />
-  </div>
-</div>
-======== */
+.drawer-bottom {
+  height: 34%;
+}
 
-// Default is the column/bottom-panel layout; a side panel opts in with .app-side-panel
-#app > .v-application__wrap {
-  // default, but specify anyway
+// It needs to be a flex column so that the children can fill the height
+#drawer .v-navigation-drawer__content {
+  display: flex;
   flex-direction: column;
-  max-height: 100svh;
 }
 
-#app.app-side-panel > .v-application__wrap {
-  flex-direction: row;
-}
-
-// side-panel layout: #drawer follows #main-content in the DOM,
-// so flipping the order is what puts the panel on the left of the view
-// order sets the order of the children of a flex container
-#app.app-side-panel {
-  #main-content {
-    order: 1; // on the right
-  }
-
-  #drawer {
-    order: 0; // on the left
-  }
-}
-
-// in-flow flex sibling of #main-content, so opening it shrinks the WWT view
-// instead of covering it. Default is the bottom panel: full width, growing in height.
-#drawer {
-  flex: 0 0 auto;
-  overflow: hidden;
-  width: 100%;
-  height: 0;
-  border-radius: 5px 5px 0 0;
-
-  &.drawer-open {
-    height: 34%;
-  }
-}
-
-// side panel: full height, growing in width
-.app-side-panel #drawer {
-  width: 0;
-  height: 100%;
-  border-radius: 0 5px 5px 0;
-
-  &.drawer-open {
-    width: 34%;
-  }
-}
-
-/** ===================== */
-
-// Basic text styling for the TabbedSheet's content 
+// Basic text styling for the TabbedSheet's content
 // it is better to set in the main app than to set things in the component
 // since the component may end up being imported from the toolkit. 
 .cds-info-sheet .tab-page {
