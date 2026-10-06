@@ -163,9 +163,9 @@
       :class="[sidePanel ? 'info-side' : 'info-bottom', showTextSheet ? 'drawer-open' : 'drawer-closed']"
     >
       <!--
-        The Information Sheet and InfoPage are vue "tightly coupled" components
-        This means an InfoPage can only be used within an TabbedSheet.
-        The info-page automatically registers itself as a tab in the information sheet, and unregisters itself when it is destroyed.
+        The Tabbed Sheet and TabPage are vue "tightly coupled" components
+        This means a TabPage can only be used within an TabbedSheet.
+        The tab-page automatically registers itself as a tab in the information sheet, and unregisters itself when it is destroyed.
 
         v-model:tab is the name of the currently selected tab. It comes from the title in kebab-case or the value if specified
         Each tab must havea unique value. If the sheet is closed and you want to show a specific tab, you must set
@@ -187,29 +187,29 @@
         align-tabs="start"
         compact-tabs
       >
-        <!-- info-page content is wrapped in a .info-page class  -->
-        <info-page title="Information">
-          <!-- everything inside the info-page is wrapped in a div with class "info-page" -->
+        <!-- tab-page content is wrapped in a .tab-page class  -->
+        <tab-page title="Information">
+          <!-- everything inside the tab-page is wrapped in a div with class "tab-page" -->
           <!-- we generally use heading level 3 (the same level as the tabs) -->
           <h3>Science Information</h3>
           <p>Sample Science Information</p>
-        </info-page>
+        </tab-page>
 
         <!-- 
         Example of an Info Page with a stable footer and scrollable upper section. 
         -->
-        <info-page title="Example" name="example">
+        <tab-page title="Example" name="example">
           <div class="ip-example-header">[Optional] This will stay at the top</div>
           <div class="flex-grow-1 overflow-y-auto my-5 bg-red">
             <p>This will fill the middle and scroll if needed.</p>
             <p>The <code>flex-grow: 1</code>, causes it to fill the parent's height because the parent
-              <code>.info-page</code> is <code>display: flex</code></p>
+              <code>.tab-page</code> is <code>display: flex</code></p>
             <p v-for="i in 100" :key="i">This is line {{ i }}</p>
           </div>
           <div class="ip-example-footer">This will stay at the bottom</div>
-        </info-page>
+        </tab-page>
 
-        <!-- the user guide is an <InfoPage title="User Guide" value="user-guide>...</InfoPage>"
+        <!-- the user guide is an <TabPage title="User Guide" value="user-guide>...</TabPage>"
          it can be userful to move complex content into a separate component
          -->
         <user-guide />
@@ -237,7 +237,7 @@ import VideoWrapper from "./components/VideoWrapper.vue";
 import WwtLoader from "./components/Loader.vue";
 import WebglTest from "./components/WebGlTest.vue";
 import TabbedSheet from "./components/TabbedSheet.vue";
-import InfoPage from "./components/InfoPage.vue";
+import TabPage from "./components/TabPage.vue";
 import UserGuide from "./components/UserGuide.vue";
 import { useAppLayout } from "./composables/useAppLayout";
 import ClosableDialog from "./components/ClosableDialog.vue";
@@ -691,7 +691,7 @@ The default DOM structure is basically
 // Basic text styling for the TabbedSheet's content 
 // it is better to set in the main app than to set things in the component
 // since the component may end up being imported from the toolkit. 
-.cds-info-sheet .info-page {
+.cds-info-sheet .tab-page {
   h3 {
     color: steelblue;
   }

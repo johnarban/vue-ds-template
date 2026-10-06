@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/max-attributes-per-line -->
 <template>
-  <!-- the vars go on the root so the tabs, the close icon and every InfoPage
+  <!-- the vars go on the root so the tabs, the close icon and every TabPage
        inherit the same set -->
   <v-card
     class="cds-info-sheet"
@@ -14,7 +14,7 @@
          does not fire here, leaving that tab unreachable by keyboard. Drive it
          ourselves. -->
 
-    <!-- mandatory gets rid of a recursion when v-if'ing away InfoPages
+    <!-- mandatory gets rid of a recursion when v-if'ing away TabPages
      by default has a mandatory = force, means vuetify will pick a tab if nothing is selected
      so if we are v-if'ing away what is selected, this created a cycle where because what is v-if'd
      controls what tabs are available, and so it would spiral. but we don't want that behavior anyway. 
@@ -86,13 +86,13 @@ export interface Props {
   tabColor?: string;
   /** the bar under the selected tab. Defaults to `tabColor`. */
   sliderColor?: string;
-  /* text color for content of each InfoPage --info-sheet-text-color */
+  /* text color for content of each TabPage --info-sheet-text-color */
   textColor?: string;
   /* --info-sheet-accent-color */
   accentColor?: string;
   /** the sheet's background --info-sheet-bg */
   bgColor?: string;
-  /** each InfoPage's background. Transparent by default, so `bgColor` shows through. */
+  /** each TabPage's background. Transparent by default, so `bgColor` shows through. */
   pageColor?: string;
   /** hide the tab bar, preserves some space for the close button if present */
   hideTabs?: boolean;
@@ -132,7 +132,7 @@ interface TabSpec {
   value: string;
 }
 
-/** this will hold the list of tabs that get registered by child InfoPage components */
+/** this will hold the list of tabs that get registered by child TabPage components */
 const tabs = ref<TabSpec[]>([]);
 const visibleTabs = computed(() => {
   if (props.onlyShowOne) {
@@ -188,7 +188,7 @@ watch(
   { flush: "post" },
 );
 
-// This function will allow the child `InfoPage` to register their title
+// This function will allow the child `TabPage` to register their title
 // with the parent `TabbedSheet`
 function registerTab(value: string, title: string) {
   const existing = indexOfTab(value);
@@ -306,7 +306,7 @@ const cssVars = computed(() => {
     right: calc((2em - 0.6875em) / 3);
   }
 
-  :deep(.info-page) {
+  :deep(.tab-page) {
     a {
       color: currentColor;
       text-decoration-style: dotted;

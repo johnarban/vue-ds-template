@@ -46,9 +46,9 @@ const _isActive = computed(() => tabsProvider.activeTab.value === tabValue);
 onUnmounted(() => {
   const unregisered = tabsProvider.unregisterTab(tabValue);
   if (!unregisered) {
-    console.warn(`InfoPage "${props.title}" was not unregistered. Check that it was registered properly`);
+    console.warn(`TabPage "${props.title}" was not unregistered. Check that it was registered properly`);
   } else {
-    console.log(`InfoPage "${props.title}" unregistered successfully`);
+    console.log(`TabPage "${props.title}" unregistered successfully`);
   }
 });
 </script>
