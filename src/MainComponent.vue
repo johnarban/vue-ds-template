@@ -180,6 +180,8 @@
       id="drawer"
       :key="sidePanel ? 'side' : 'bottom'"
       v-model="drawerOpen"
+      tag="aside"
+      aria-label="Information"
       :location="sidePanel ? 'start' : 'bottom'"
       :width="sidePanel ? drawerWidth : undefined"
       :mobile-breakpoint="0"
