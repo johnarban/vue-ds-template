@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 import CloseButton from '@/components/CloseButton.vue';
 
 const showPrivacyDialog = defineModel<boolean>({default: false, required: true});
