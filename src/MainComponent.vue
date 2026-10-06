@@ -57,7 +57,7 @@
               -->
             <icon-button
               v-model="showTextSheet"
-              icon="question"
+              icon="book-open"
               :aria-label="showTextSheet ? 'Hide Info' : 'Learn More'"
               :color="accentColor"
               :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
@@ -65,6 +65,16 @@
               size="lg"
             >
             </icon-button>
+            <icon-button
+              v-model="showUserGuideSheet"
+              icon="question"
+              aria-label="User guide"
+              :color="accentColor"
+              tooltip-text="User guide"
+              tooltip-location="start"
+              size="lg"
+            />
+
             <icon-button
               v-model="showVideo"
               icon="video"
@@ -156,12 +166,12 @@
       :tour="tour"
       :small-size="false"
     />
-
+    
     <!-- #drawer is providing the positioning in the flex-layout -->
     <div
       v-show="!showSplashScreen"
       id="drawer"
-      :class="[sidePanel ? 'info-side' : 'info-bottom', showTextSheet ? 'drawer-open' : 'drawer-closed']"
+      :class="[sidePanel ? 'info-side' : 'info-bottom', showTextSheet || showUserGuideSheet ? 'drawer-open' : 'drawer-closed']"
     >
       <!--
         The Tabbed Sheet and TabPage are vue "tightly coupled" components
@@ -211,8 +221,38 @@
         <!-- the user guide is an <TabPage title="User Guide" value="user-guide>...</TabPage>"
          it can be userful to move complex content into a separate component
          -->
-        <user-guide />
+        <tab-page title="User Guide" value="user-guide">
+          <user-guide />
+        </tab-page>
       </tabbed-sheet>
+      
+      <!-- 
+        You don't have to use the tabbed sheet though. 
+        If you would rather just have single sheets, controlled by their own button, or something else
+        just use a v-sheet (provides the card colors) and make it a
+        flex-column with 100% height.
+      -->
+      <v-sheet
+        v-if="showUserGuideSheet"
+        v-focus-return="showUserGuideSheet"
+        class="d-flex flex-column page-sheet"
+        height="100%"
+        tabindex="-1"
+      >
+        <!-- A header with a close button to he right -->
+        <div class="d-flex align-center justify-space-between pa-3">
+          <h3>User Guide</h3>
+          <CloseButton
+            label="Close User Guide"
+            color="primary"
+            @click="showUserGuideSheet = false"
+          />
+        </div>
+        <!-- div.page-sheet-body fills the flex column and is scrollable -->
+        <div class="page-sheet-body">
+          <user-guide />
+        </div>
+      </v-sheet>
     </div>
   </v-app>
 </template>
@@ -238,6 +278,7 @@ import WebglTest from "./components/WebGlTest.vue";
 import TabbedSheet from "./components/TabbedSheet.vue";
 import TabPage from "./components/TabPage.vue";
 import UserGuide from "./components/UserGuide.vue";
+import CloseButton from "./components/CloseButton.vue";
 import { useAppLayout } from "./composables/useAppLayout";
 import ClosableDialog from "./components/ClosableDialog.vue";
 import { useWtmlLoader } from "./composables/useWtmlLoader";
@@ -446,7 +487,16 @@ const infoSheetTab = ref("");
 function openInfoSheetTab(tabValue: string) {
   infoSheetTab.value = tabValue;
   showTextSheet.value = true;
+  // we don't want both open at the same time
+  showUserGuideSheet.value = false;
 }
+const showUserGuideSheet = ref(false);
+// we dont want both open at the same time
+watch(showUserGuideSheet, (newVal) => {
+  if (newVal) {
+    showTextSheet.value = false;
+  }
+});
 
 /**
   This is convenient if there's any other logic that we want to run
@@ -698,6 +748,13 @@ The default DOM structure is basically
   padding: 1rem;
   display: flex;
   flex-direction: column;
+}
+
+.page-sheet-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 1rem 1rem;
 }
 
 /* Small and quiet in the corner, clearing #logo-credits in the same corner
