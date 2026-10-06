@@ -165,7 +165,7 @@
     >
       <!--
         The Information Sheet and InfoPage are vue "tightly coupled" components
-        This means an InfoPage can only be used within an InformationSheet.
+        This means an InfoPage can only be used within an TabbedSheet.
         The info-page automatically registers itself as a tab in the information sheet, and unregisters itself when it is destroyed.
 
         v-model:tab is the name of the currently selected tab. It comes from the title in kebab-case or the value if specified
@@ -177,7 +177,7 @@
         only-show-one: (default: false) only show the active tab, hide the others
         closable: (default: true) show the close button
       -->
-      <information-sheet
+      <tabbed-sheet
         id="side-panel-sheet"
         v-model="showTextSheet"
         v-model:tab="infoSheetTab"
@@ -214,7 +214,7 @@
          it can be userful to move complex content into a separate component
          -->
         <user-guide />
-      </information-sheet>
+      </tabbed-sheet>
     </div>
   </v-app>
 </template>
@@ -237,7 +237,7 @@ import SplashScreen from "./components/SplashScreen.vue";
 import VideoWrapper from "./components/VideoWrapper.vue";
 import WwtLoader from "./components/Loader.vue";
 import WebglTest from "./components/WebGlTest.vue";
-import InformationSheet from "./components/InformationSheet.vue";
+import TabbedSheet from "./components/TabbedSheet.vue";
 import InfoPage from "./components/InfoPage.vue";
 import UserGuide from "./components/UserGuide.vue";
 import { useAppLayout } from "./composables/useAppLayout";
@@ -689,7 +689,7 @@ The default DOM structure is basically
 
 /** ===================== */
 
-// Basic text styling for the InformationSheet's content 
+// Basic text styling for the TabbedSheet's content 
 // it is better to set in the main app than to set things in the component
 // since the component may end up being imported from the toolkit. 
 .cds-info-sheet .info-page {

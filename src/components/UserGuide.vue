@@ -1,4 +1,4 @@
-<!-- The User Guide tab's content, lifted out of InformationSheet.vue when that
+<!-- The User Guide tab's content, lifted out of TabbedSheet.vue when that
      moved to why-roman's tab-registration structure. Same content as before. -->
 <template>
   <InfoPage

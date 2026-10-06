@@ -16,7 +16,7 @@
 <script setup lang="ts">
 import { inject, computed, onUnmounted } from "vue";
 
-import { injectionKey } from "./InformationSheet.vue";
+import { injectionKey } from "./TabbedSheet.vue";
 
 const props = defineProps<{
   title: string;
@@ -28,7 +28,7 @@ const cssVars = computed(() => (props.bgColor ? { "--info-sheet-page-bg": props.
 
 const tabsProvider = inject(injectionKey, null);
 if (!tabsProvider?.withinTabs) {
-  throw new Error("InformationPage must be used within an InformationSheet");
+  throw new Error("InformationPage must be used within an TabbedSheet");
 }
 
 const kebabCase = (str: string) =>

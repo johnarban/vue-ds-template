@@ -189,7 +189,7 @@ watch(
 );
 
 // This function will allow the child `InfoPage` to register their title
-// with the parent `InformationSheet`
+// with the parent `TabbedSheet`
 function registerTab(value: string, title: string) {
   const existing = indexOfTab(value);
   if (existing !== -1) return existing;
