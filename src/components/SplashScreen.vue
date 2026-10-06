@@ -30,7 +30,6 @@
             rounded="lg"
             tabindex="0"
             @click="closeSplashScreen"
-            @keyup.enter="closeSplashScreen"
           >
             {{ props.loaded ? "Get Started" : "Loading..." }}
           </v-btn>
