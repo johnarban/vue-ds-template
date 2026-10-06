@@ -7,7 +7,7 @@
     :style="cssVars"
     transition="fade-transition"
   >
-    <focus-trap>
+    <focus-trap :active="showSplashScreen">
       <div
         id="splash-screen"
         v-click-outside="closeSplashScreen"
