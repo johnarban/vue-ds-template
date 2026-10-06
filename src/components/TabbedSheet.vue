@@ -122,7 +122,6 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits(["close", "update:tabName"]);
 
 function handleClose() {
-  showTextSheet.value = false;
   emit("close");
 }
 
@@ -147,7 +146,6 @@ const visibleTabs = computed(() => {
   return tabs.value;
 });
 
-const showTextSheet = defineModel<boolean>();
 /** name of the currently selected tab. kebab-case of the tab `title` if `value` not set */
 const tabName = defineModel<string>("tab", { default: "" });
 /** index of currently selected tab */
@@ -250,7 +248,7 @@ const cssVars = computed(() => {
     "--info-sheet-bg": props.bgColor ?? "rgb(var(--v-theme-surface))",
     "--info-sheet-page-bg": props.pageColor ?? "transparent",
     "--info-sheet-text-color": props.textColor ?? "rgb(var(--v-theme-on-surface))",
-    "--info-sheet-accent-color": props.accentColor ?? props.tabColor,
+    "--info-sheet-accent-color": props.accentColor ?? "rgb(var(--v-theme-primary))",
     "--info-sheet-tab-color": props.tabColor ?? "rgb(var(--v-theme-primary))",
     "--info-sheet-slider-color": props.sliderColor ?? "var(--info-sheet-tab-color)",
   };

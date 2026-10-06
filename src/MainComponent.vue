@@ -157,6 +157,7 @@
       :small-size="false"
     />
 
+    <!-- #drawer is providing the positioning in the flex-layout -->
     <div
       v-show="!showSplashScreen"
       id="drawer"
@@ -177,15 +178,13 @@
         closable: (default: true) show the close button
       -->
       <tabbed-sheet
+        v-show="showTextSheet"
         id="side-panel-sheet"
-        v-model="showTextSheet"
         v-model:tab="infoSheetTab"
         v-focus-return="showTextSheet"
-        :tab-color="accentColor"
-        :slider-color="accentColor"
-        :accent-color="accentColor"
         align-tabs="start"
         compact-tabs
+        @close="showTextSheet = false"
       >
         <!-- tab-page content is wrapped in a .tab-page class  -->
         <tab-page title="Information">
