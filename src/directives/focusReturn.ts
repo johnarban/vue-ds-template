@@ -9,7 +9,7 @@
  *
  */
 
-import type { Directive } from 'vue';
+import { nextTick, type Directive } from 'vue';
 
 
 export type FocusReturnDirective = Directive<HTMLElement, boolean>;
@@ -36,7 +36,9 @@ function activate(el: HTMLElement) {
 }
 
 function deactivate(el: HTMLElement) {
-  previouslyFocused.get(el)?.focus();
+  const target = previouslyFocused.get(el);
+  // defer: focusing immediately will lose out to (likely) vuetify's own focus-management.
+  nextTick(() => target?.focus());
 }
 
 /**
