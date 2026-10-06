@@ -188,7 +188,7 @@
     >
       <TourSheet
         v-if="showTour"
-        :class="{'floating-tour': false}"
+        :class="{'floating-tour': true}"
         :tour="tour"
         :small-size="false"
       />
@@ -321,7 +321,8 @@ const store = engineStore();
 useWWTKeyboardControls(store);
 
 const { smallSize, sidePanel, viewportWidth } = useAppLayout();
-const drawerWidth = computed(() => Math.round(viewportWidth.value * 0.34));
+const DRAWER_WIDTH_FRACTION = 34; // 34% of the viewport width
+const drawerWidth = computed(() => Math.round(viewportWidth.value * DRAWER_WIDTH_FRACTION / 100.));
 
 withDefaults(defineProps<MainComponentProps>(), {
   wwtNamespace: "vue-ds-template",
@@ -507,10 +508,10 @@ const isLoading = computed(() => !ready.value);
 /* This lets us inject component data into element CSS */
 const cssVars = computed(() => {
   return {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ["--accent-color" as any]: accentColor.value,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ["--accent-color-2" as any]: accentColor2.value,
+    "--accent-color": accentColor.value,
+    "--accent-color-2": accentColor2.value,
+    "--drawer-width": `${DRAWER_WIDTH_FRACTION}vw`,
+    
   } as StyleValue;
 });
 
@@ -533,12 +534,11 @@ function openInfoSheetTab(tabValue: string) {
 const showUserGuideSheet = ref(false);
 
 const drawerOpen = computed({
-  get: () => !showSplashScreen.value && (showTextSheet.value || showUserGuideSheet.value || showTour.value),
+  get: () => !showSplashScreen.value && (showTextSheet.value || showUserGuideSheet.value),
   set: (open: boolean) => {
     if (!open) {
       showTextSheet.value = false;
       showUserGuideSheet.value = false;
-      showTour.value = false;
     }
   },
 });
@@ -723,9 +723,11 @@ body {
   color: rgba(var(--v-theme-primary), 1) !important;
 }
 
-.drawer-bottom {
-  height: 34%;
-}
+// the height of drawer is hard-coded to be 256 pixels
+// .drawer-bottom {
+//   --drawer-bottom-height: 34%;
+//   height: var(--drawer-bottom-height);
+// }
 
 // It needs to be a flex column so that the children can fill the height
 #drawer .v-navigation-drawer__content {
@@ -769,15 +771,25 @@ body {
 
 /* make the tour float. This means pulling it of the
   flex layout and giving it a fixed position. 
+  the width and transform are indepen
 */
 .floating-tour.tour-text {
   position: fixed;
-  bottom: 7rem;
-  left: 1rem;
-  width: 34%;
-  max-width: 500px;
+  --horizontal-offset: 1rem;
+  --vertical-offset: 1rem;
+  bottom: var(--vertical-offset);
+  left: var(--horizontal-offset);
+  width: 30vw;
+  max-width: calc(100vw - 2 * var(--horizontal-offset));
   min-height: 0;
   max-height: 400px;
-  z-index: 1000;
+  z-index: 10000 !important;
+}
+
+.drawer-side .floating-tour.tour-text {
+  transform: translateX(var(--drawer-width));
+}
+.drawer-bottom .floating-tour.tour-text {
+  transform: translateY(-256px);
 }
 </style>
