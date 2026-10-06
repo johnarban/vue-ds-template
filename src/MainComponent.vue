@@ -513,6 +513,7 @@ const cssVars = computed(() => {
     "--accent-color": accentColor.value,
     "--accent-color-2": accentColor2.value,
     "--drawer-width": `${DRAWER_WIDTH_FRACTION}vw`,
+    "--drawer-bottom-height": "40vh",
     
   } as StyleValue;
 });
@@ -725,11 +726,6 @@ body {
   color: rgba(var(--v-theme-primary), 1) !important;
 }
 
-// the height of drawer is hard-coded to be 256 pixels
-// .drawer-bottom {
-//   --drawer-bottom-height: 34%;
-//   height: var(--drawer-bottom-height);
-// }
 
 // It needs to be a flex column so that the children can fill the height
 #drawer .v-navigation-drawer__content {

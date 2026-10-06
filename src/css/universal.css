@@ -17,3 +17,25 @@
 .fa-close-icon:hover {
   scale: 1.2;
 }
+
+
+/**
+Overrides needed for the v-navigation-drawer to respect the user's desired height
+**/
+
+/* the height of drawer is hard-coded to be 256 pixels 
+   so we will get it from the #app
+*/
+#app {
+  /** this will get overriden by cssVars in the inline styles
+  this needs to be set in px or vw, not %
+   */
+  --drawer-bottom-height: 0px;
+}
+.v-navigation-drawer--active.drawer-bottom {
+  height: var(--drawer-bottom-height) !important;
+}
+.v-main:has(+.v-navigation-drawer--active.drawer-bottom) {
+  /* --v-layout-bottom: var(--drawer-bottom-height) !important; */
+  padding-bottom:var(--drawer-bottom-height);
+}
