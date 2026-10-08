@@ -121,6 +121,22 @@
                   density="compact"
                 />
               </ClosableDialog>
+              <ShareButton
+                :source="urlState.getUrl"
+                :tooltip="false"
+              >
+                <template #activator="activatorProps">
+                  <icon-button
+                    icon="share-nodes"
+                    aria-label="Get link to share selected view"
+                    :color="accentColor"
+                    tooltip-text="Share"
+                    tooltip-location="start"
+                    size="lg"
+                    :activator-props="activatorProps"
+                  />
+                </template>
+              </ShareButton>
             </div>
           </div>
 
@@ -291,6 +307,7 @@ import {
   useWWTKeyboardControls,
   IconButton,
   CreditLogos,
+  ShareButton,
 } from "@cosmicds/vue-toolkit";
 import SplashScreen from "./components/SplashScreen.vue";
 import VideoWrapper from "./components/VideoWrapper.vue";
@@ -321,6 +338,15 @@ export interface MainComponentProps {
 const store = engineStore();
 
 useWWTKeyboardControls(store);
+
+// example of loading state. 
+import { useUrlState } from "./composables/useUrlState";
+const { raRad, decRad, rollRad, zoomDeg } = storeToRefs(store);
+const urlState = useUrlState({ autoUpdate: true, inAddressBar: false, clearOnLoad: true });
+urlState.track("ra", raRad);
+urlState.track("dec", decRad);
+urlState.track("roll", rollRad);
+urlState.track("zoom", zoomDeg);
 
 const { smallSize, sidePanel, viewportWidth } = useAppLayout();
 const DRAWER_WIDTH_FRACTION = 34; // 34% of the viewport width
