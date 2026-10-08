@@ -369,18 +369,9 @@ import {
   CreditLogos,
   ShareButton,
 } from "@cosmicds/vue-toolkit";
-import SplashScreen from "./components/SplashScreen.vue";
-import VideoWrapper from "./components/VideoWrapper.vue";
-import WwtLoader from "./components/Loader.vue";
-import WebglTest from "./components/WebGlTest.vue";
-import TabbedSheet from "./components/TabbedSheet.vue";
-import TabPage from "./components/TabPage.vue";
-import UserGuide from "./components/UserGuide.vue";
-import CloseButton from "./components/CloseButton.vue";
+
 import { useAppLayout } from "./composables/useAppLayout";
-import ClosableDialog from "./components/ClosableDialog.vue";
 import { useWtmlLoader } from "./composables/useWtmlLoader";
-import ImageCrossfadeSlider from "./components/ImageCrossfadeSlider.vue";
 
 const extraLogos = [
   {
