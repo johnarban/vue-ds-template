@@ -341,12 +341,8 @@ useWWTKeyboardControls(store);
 
 // example of loading state. 
 import { useUrlState } from "./composables/useUrlState";
-const { raRad, decRad, rollRad, zoomDeg } = storeToRefs(store);
-const urlState = useUrlState({ autoUpdate: true, inAddressBar: false, clearOnLoad: true });
-urlState.track("ra", raRad);
-urlState.track("dec", decRad);
-urlState.track("roll", rollRad);
-urlState.track("zoom", zoomDeg);
+const urlState = useUrlState({ autoUpdate: true, inAddressBar: true, clearOnLoad: false });
+
 
 const { smallSize, sidePanel, viewportWidth } = useAppLayout();
 const DRAWER_WIDTH_FRACTION = 34; // 34% of the viewport width
@@ -489,6 +485,8 @@ const tour = useTour<TourStepContent>({
 function startTour() {
   showTour.value = true;
 }
+
+// urlState.track("step", tour.stepIndex);
 
 
 const backgroundItems = ref<{ title: string; value: string }[]>([]);
