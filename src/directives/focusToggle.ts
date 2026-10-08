@@ -34,11 +34,11 @@ declare module 'vue' {
 /** the WeakMap persists, but key elements can be garbage-collected so they don't build up when no longer relevant */
 const previouslyFocused = new WeakMap<HTMLElement, HTMLElement | null>();
 
-import { short } from '../utils';
+import { _short } from '../utils';
 
 function activate(el: HTMLElement) {
   previouslyFocused.set(el, document.activeElement as HTMLElement | null);
-  console.log(`focus-toggle: focusing ${short(el)} (was ${short(document.activeElement)})`);
+  console.log(`focus-toggle: focusing ${_short(el)} (was ${_short(document.activeElement)})`);
   el.focus();
 }
 
@@ -46,7 +46,7 @@ function deactivate(el: HTMLElement) {
   const target = previouslyFocused.get(el);
   // defer: focusing immediately will lose out to (likely) vuetify's own focus-management.
   nextTick(() => {
-    console.log(`focus-toggle: returning focus to ${short(target)}`);
+    console.log(`focus-toggle: returning focus to ${_short(target)}`);
     target?.focus();
   });
 }

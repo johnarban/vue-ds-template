@@ -31,10 +31,10 @@ declare module 'vue' {
     }
 }
 
-import { short } from '../utils';
+import { _short } from '../utils';
 
 function activate(el: HTMLElement) {
-  console.log(`focus-grab: focusing ${short(el)} (was ${short(document.activeElement)})`);
+  console.log(`focus-grab: focusing ${_short(el)} (was ${_short(document.activeElement)})`);
   el.focus();
 }
 
