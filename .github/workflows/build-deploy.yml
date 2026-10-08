@@ -17,6 +17,9 @@ jobs:
   build:
     if: ${{ github.repository_owner == 'cosmicds' }}
     runs-on: ubuntu-latest
+    env:
+      # variables are strings. this will be string "true" or "false"
+      IS_DEV: ${{ (github.base_ref || github.ref_name) == 'dev' }}
     steps:
       - name: Checkout current branch
         uses: actions/checkout@v4
@@ -55,9 +58,9 @@ jobs:
           branch: gh-pages
           folder: dist
           clean: true
-          # `clean` deletes inside `target-folder`, so a root deploy would
-          # wipe dev/, so exclude. 
-          clean-exclude: /dev
+          # `clean` deletes inside `target-folder`, so a root deploy would wipe dev/, so exclude.
+          # but when the target_folder is dev/, we want to clean it, so don't exclude anything.
+          clean-exclude: ${{ env.IS_DEV == 'true' && '' || '/dev' }}
           # Work aimed at dev (a PR into it, or a push to it) lands in /dev;
           # main deploys to the root.
-          target-folder: ${{ (github.base_ref || github.ref_name) == 'dev' && 'dev' || '' }}
+          target-folder: ${{ env.IS_DEV == 'true' && 'dev' || '' }}
