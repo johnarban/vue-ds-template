@@ -421,13 +421,26 @@ const showWebGL2Warning = ref(false);
  */
 const hubbleLayer = ref<ImageSetLayer | null>(null);
 
-useWtmlLoader("https://web.wwtassets.org/specials/2023/cosmicds-carina/collection/carina_nebula.wtml", {
-  goTo: false,
-  instant: true,
-  onLoad: (out) => {
-    hubbleLayer.value = out.layer;
-  },
+store.waitForReady().then(() => {
+  store.loadImageCollection({
+    url: "https://web.wwtassets.org/specials/2023/cosmicds-carina/collection/carina_nebula.wtml",
+    loadChildFolders: false,
+  }).then((folder) => {
+    const place = folder.get_children()?.[0] as Place;
+    const imageset = place?.get_backgroundImageset() ?? place?.get_studyImageset();
+    if (imageset == null) return;
+    store.addImageSetLayer({
+      url: imageset.get_url(),
+      mode: "autodetect",
+      name: imageset.get_name(),
+      goto: false,
+    }).then((layer) => {
+      hubbleLayer.value = store.imagesetLayerById(layer.id.toString()) ?? null;
+    });
 });
+});
+
+
 const jwstCarina = useWtmlLoader("https://web.wwtassets.org/specials/2023/cosmicds-carina/collection/jwst_carina.wtml", {
   single: true,
   goTo: false,
