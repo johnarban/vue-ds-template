@@ -40,7 +40,7 @@
       v-model:response-opt-out="responseOptOut"
     />
     <CDSPrivacyPolicy v-model="showPrivacyPolicyInfo" />
-    
+
     <v-main>
       <div id="main-content">
         <WorldWideTelescope :wwt-namespace="wwtNamespace"></WorldWideTelescope>
@@ -301,6 +301,20 @@
         </div>
       </v-sheet>
     </v-navigation-drawer>
+
+    <!-- rating prompt, shown once a while after load (see useUserExperienceRating) -->
+    <UserExperienceDialog
+      :show-rating="showRating"
+      :question="question"
+      @dismiss="dismissRating"
+      @rating="(rating) => updateUserExperienceInfo(rating, null)"
+      @finish="(rating, comment) => {
+        updateUserExperienceInfo(rating, comment);
+        showRating = false;
+      }"
+      @opt-out="optOutRating"
+      @what-is-this="showPrivacyPolicyInfo = true"
+    />
   </v-app>
 </template>
 
@@ -403,7 +417,9 @@ const { xs } = useDisplay();
 
 import DataCollectionOptOutDialog from "./privacy/DataCollectionOptOutDialog.vue";
 import CDSPrivacyPolicy from "./privacy/CDSPrivacyPolicy.vue";
+import UserExperienceDialog from "./privacy/UserExperienceDialog.vue";
 import { usePrivacy } from "./privacy/usePrivacy";
+import { useUserExperienceRating } from "./privacy/useUserExperienceRating";
 
 // TODO: Suggestion: off-load this to another file
 /** app tracking setup */
@@ -424,6 +440,7 @@ function getTrackingData() {
 const {
   createUserEntry,
   responseOptOut,
+  userID,
   showPrivacyDialog,
   showPrivacyPolicyInfo,
   conditionalShowPrivacyDialog,
@@ -434,6 +451,15 @@ const {
   resetData: resetTrackingData,
   getData: getTrackingData,
 });
+
+const {
+  showRating,
+  question,
+  dismiss: dismissRating,
+  optOut: optOutRating,
+  updateUserExperienceInfo,
+  initializePrompt,
+} = useUserExperienceRating(STORY_NAME, userID, { responseOptOut, timeout: 10_000, });
 
 
 const showTour = ref(false);
@@ -530,6 +556,7 @@ onMounted(() => {
       .map((iset) => ({ title: iset.get_name(), value: iset.get_name() }));
 
     createUserEntry();
+    initializePrompt();
   });
 });
 

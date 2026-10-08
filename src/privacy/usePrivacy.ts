@@ -15,15 +15,11 @@ export interface UsePrivacyOptions extends DataTrackingOptions {
  * refs, and implements the timeout watcher
  */
 export function usePrivacy(options: Prettify<UsePrivacyOptions>) {
-  
-  window.localStorage.setItem(options.userIDKey, 'test-user-id');
-  
-  
-  
+
   const showPrivacyDialog = ref(false);
   const showPrivacyPolicyInfo = ref(false);
-  
-  const { createUserEntry, responseOptOut } = useDataTracking({
+
+  const { createUserEntry, responseOptOut, userID } = useDataTracking({
     optOutKey: options.optOutKey,
     userIDKey: options.userIDKey,
     apiUrl: options.apiUrl ?? "https://api.cosmicds.cfa.harvard.edu",
@@ -72,6 +68,7 @@ export function usePrivacy(options: Prettify<UsePrivacyOptions>) {
   return {
     createUserEntry,
     responseOptOut,
+    userID,
     showPrivacyDialog,
     showPrivacyPolicyInfo,
     conditionalShowPrivacyDialog,
