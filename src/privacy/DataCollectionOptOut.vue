@@ -35,7 +35,7 @@
       </v-btn>
       <!-- take  -->
       <v-btn
-        v-focus-return="showPrivacyDialog"
+        v-focus-toggle="showPrivacyDialog"
         variant="tonal"
         size="small"
         color="green"

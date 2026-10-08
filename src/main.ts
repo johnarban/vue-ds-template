@@ -37,7 +37,9 @@ library.add(faXmark);
 library.add(faImage);
 
 import hide from "./directives/hide";
-import focusReturn from "./directives/focusReturn";
+import focusToggle from "./directives/focusToggle";
+import focusGrab from "./directives/focusGrab";
+
 createApp(MainComponent, {
   wwtNamespace: "vue-ds-template",
 })
@@ -50,7 +52,8 @@ createApp(MainComponent, {
 
   // Directives
   .directive( "hide", hide)
-  .directive("focus-return", focusReturn)
+  .directive("focus-toggle", focusToggle)
+  .directive("focus-grab", focusGrab)
 
   // Mount
   .mount("#app-mount");

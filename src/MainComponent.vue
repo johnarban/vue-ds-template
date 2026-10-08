@@ -38,7 +38,8 @@
       <div id="main-content">
         <WorldWideTelescope :wwt-namespace="wwtNamespace"></WorldWideTelescope>
         <wwt-loader v-model="isLoading" />
-
+        <div id="tour-floating-location" />
+        
         <!-- This block contains the elements (e.g. icon buttons displayed at/near the top of the screen) -->
 
         <div v-show="!showSplashScreen" id="wwt-overlay">
@@ -205,9 +206,20 @@
       :temporary="false"
     >
       <!-- disable=true for non-floating tour -->
-      <Teleport to="body" :disabled="!floatingTour">
+      <!-- 
+      Teleporting to the "body" places it last in the DOM so last in the tab-focus order.
+      we actually want it pretty early, so instead of hacking a focus control, let's just put it where it belongs. 
+      This won't help the case where we are in the v-navigation-drawer though
+      -->
+      <Teleport 
+        to="#tour-floating-location" 
+        defer
+        :disabled="!floatingTour" 
+      >
         <TourSheet
           v-if="showTour"
+          v-focus-grab="showTour"
+          tabindex="-1"
           :class="{'floating-tour': floatingTour}"
           :tour="tour"
           :small-size="false"
@@ -231,7 +243,7 @@
         v-show="showTextSheet"
         id="side-panel-sheet"
         v-model:tab="infoSheetTab"
-        v-focus-return="showTextSheet"
+        v-focus-toggle="showTextSheet"
         align-tabs="start"
         compact-tabs
         @close="showTextSheet = false"
@@ -274,7 +286,7 @@
       -->
       <v-sheet
         v-if="showUserGuideSheet"
-        v-focus-return="showUserGuideSheet"
+        v-focus-toggle="showUserGuideSheet"
         class="d-flex flex-column page-sheet"
         height="100%"
         tabindex="-1"
@@ -322,7 +334,7 @@
     >
       <CDSPrivacyPolicy
         v-model="showPrivacyPolicyInfo" 
-        v-focus-return="showPrivacyDialog"
+        v-focus-toggle="showPrivacyDialog"
         tabindex="-1"
       />
     </v-dialog>

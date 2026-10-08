@@ -12,41 +12,55 @@
 import { nextTick, type Directive } from 'vue';
 
 
-export type FocusReturnDirective = Directive<HTMLElement, boolean>;
+export type FocusToggleDirective = Directive<HTMLElement, boolean>;
 
 declare module 'vue' {
     export interface GlobalDirectives {
         /**
-         * :v-focus-return=\<boolean\>
+         * :v-focus-toggle=\<boolean\>
          *
          * Focuses the element when the bound value becomes true. When it
          * becomes false, returns focus to whatever was focused beforehand -
          * works regardless of what that was, so any kind of opener is fine.
+         *
+         * make sure element is focusable. if wrapper is a not a focusable
+         * element ([MDN](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus))
+         * add `tabindex="-1"` after the v-focus*
         */
-        vFocusReturn: FocusReturnDirective
+        vFocusToggle: FocusToggleDirective
     }
 }
 
 /** the WeakMap persists, but key elements can be garbage-collected so they don't build up when no longer relevant */
 const previouslyFocused = new WeakMap<HTMLElement, HTMLElement | null>();
 
+import { short } from '../utils';
+
 function activate(el: HTMLElement) {
   previouslyFocused.set(el, document.activeElement as HTMLElement | null);
+  console.log(`focus-toggle: focusing ${short(el)} (was ${short(document.activeElement)})`);
   el.focus();
 }
 
 function deactivate(el: HTMLElement) {
   const target = previouslyFocused.get(el);
   // defer: focusing immediately will lose out to (likely) vuetify's own focus-management.
-  nextTick(() => target?.focus());
+  nextTick(() => {
+    console.log(`focus-toggle: returning focus to ${short(target)}`);
+    target?.focus();
+  });
 }
 
 /**
- * :v-focus-return=\<boolean\>
+ * :v-focus-toggle=\<boolean\>
  *
  * Focuses the element when the bound value becomes true. When it becomes
  * false, returns focus to whatever was focused beforehand - works
  * regardless of what that was, so any kind of opener is fine.
+ *
+ * make sure element is focusable. if wrapper is a not a focusable element
+ * ([MDN](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus))
+ * add `tabindex="-1"` after the v-focus*
 */
 export default {
   // the element may be v-if'd in already active (e.g. default true)
@@ -67,4 +81,4 @@ export default {
   unmounted: (el, binding) => {
     if (binding.value) deactivate(el);
   },
-} satisfies FocusReturnDirective;
+} satisfies FocusToggleDirective;

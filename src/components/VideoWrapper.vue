@@ -7,7 +7,7 @@
     close-on-content-click
   >
     <div
-      v-focus-return="showVideoSheet"
+      v-focus-toggle="showVideoSheet"
       class="video-wrapper"
       tabindex="-1"
     >
