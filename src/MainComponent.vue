@@ -61,6 +61,7 @@
                 icon="book-open"
                 :aria-label="showTextSheet ? 'Hide Info' : 'Learn More'"
                 :color="accentColor"
+                :focus-color="accentColor"
                 :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
                 tooltip-location="start"
                 size="lg"
@@ -71,6 +72,7 @@
                 icon="question"
                 aria-label="User guide"
                 :color="accentColor"
+                :focus-color="accentColor"
                 tooltip-text="User guide"
                 tooltip-location="start"
                 size="lg"
@@ -81,6 +83,7 @@
                 icon="video"
                 aria-label="Watch video"
                 :color="accentColor"
+                :focus-color="accentColor"
                 tooltip-text="Watch video"
                 tooltip-location="start"
                 size="lg"
@@ -91,6 +94,7 @@
                 icon="signs-post"
                 aria-label="Show Tour"
                 :color="accentColor"
+                :focus-color="accentColor"
                 tooltip-text="Show Tour"
                 tooltip-location="start"
                 size="lg"
@@ -107,6 +111,7 @@
                     icon="image"
                     aria-label="Settings"
                     :color="accentColor"
+                    :focus-color="accentColor"
                     tooltip-text="Settings"
                     tooltip-location="start"
                     size="lg"
@@ -130,6 +135,7 @@
                     icon="share-nodes"
                     aria-label="Get link to share selected view"
                     :color="accentColor"
+                    :focus-color="accentColor"
                     tooltip-text="Share"
                     tooltip-location="start"
                     size="lg"
@@ -151,6 +157,7 @@
                 icon="mdi-lock"
                 aria-label="Change privacy settings"
                 :color="accentColor"
+                :focus-color="accentColor"
                 :border="false"
                 size="0.5em"
                 tooltip-text="Change privacy settings"
@@ -204,13 +211,15 @@
       :class="sidePanel ? 'drawer-side' : 'drawer-bottom'"
       :temporary="false"
     >
-      <TourSheet
-        v-if="showTour"
-        :class="{'floating-tour': true}"
-        :tour="tour"
-        :small-size="false"
-      />
-
+      <!-- disable=true for non-floating tour -->
+      <Teleport to="body" :disabled="!floatingTour">
+        <TourSheet
+          v-if="showTour"
+          :class="{'floating-tour': floatingTour}"
+          :tour="tour"
+          :small-size="false"
+        />
+      </Teleport>
       <!--
         The Tabbed Sheet and TabPage are vue "tightly coupled" components
         This means a TabPage can only be used within an TabbedSheet.
@@ -428,6 +437,7 @@ const {
 
 
 const showTour = ref(false);
+const floatingTour = ref(false);
 
 import {
   TourSheet,
@@ -481,6 +491,7 @@ const tour = useTour<TourStepContent>({
     }
   ],
 });
+urlState.track("tour", tour.stepID);
 
 function startTour() {
   showTour.value = true;
@@ -561,21 +572,15 @@ function openInfoSheetTab(tabValue: string) {
 const showUserGuideSheet = ref(false);
 
 const drawerOpen = computed({
-  get: () => !showSplashScreen.value && (showTextSheet.value || showUserGuideSheet.value),
+  get: () => !showSplashScreen.value && (showTextSheet.value || showUserGuideSheet.value || (showTour.value && !floatingTour.value)),
   set: (open: boolean) => {
     if (!open) {
       showTextSheet.value = false;
       showUserGuideSheet.value = false;
+      showTour.value = false;
     }
   },
 });
-// we dont want both open at the same time
-watch(showUserGuideSheet, (newVal) => {
-  if (newVal) {
-    showTextSheet.value = false;
-  }
-});
-
 
 /**
   This is convenient if there's any other logic that we want to run
@@ -589,17 +594,10 @@ function closeSplashScreen() {
   startTour();
 }
 
-// don't allow showTour and showTextSheet to be true at the same time
-watch(showTour, (newVal) => {
-  if (newVal) {
-    showTextSheet.value = false;
-  }
-});
-watch(showTextSheet, (newVal) => {
-  if (newVal) {
-    showTour.value = false;
-  }
-});
+import { mutuallyExclusive } from "./composables/utils";
+
+// only one of the tour, text sheet, and user guide sheet can be open at a time
+mutuallyExclusive(showTour, showTextSheet, showUserGuideSheet);
 </script>
 
 <style lang="less">
@@ -807,11 +805,14 @@ body {
   max-height: 400px;
   z-index: 10000 !important;
 }
-
+/* 
+// since we are using Teleport, it is no longer a child of the drawer
+// so these will have no effect
 .drawer-side .floating-tour.tour-text {
   transform: translateX(var(--drawer-width));
 }
 .drawer-bottom .floating-tour.tour-text {
   transform: translateY(-256px);
 }
+*/
 </style>
