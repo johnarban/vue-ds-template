@@ -34,9 +34,6 @@
 </template>
 
 <script setup lang="ts">
-
-import CloseButton from '@/components/CloseButton.vue';
-
 const showPrivacyDialog = defineModel<boolean>({default: false, required: true});
 
 </script>
