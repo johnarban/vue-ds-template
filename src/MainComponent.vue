@@ -33,13 +33,6 @@
       v-model="showVideo"
     />
 
-    <!-- privacy setup -->
-    <DataCollectionOptOutDialog
-      v-model:show="showPrivacyDialog"
-      v-model:show-privacy-policy="showPrivacyPolicyInfo"
-      v-model:response-opt-out="responseOptOut"
-    />
-    <CDSPrivacyPolicy v-model="showPrivacyPolicyInfo" />
 
     <v-main>
       <div id="main-content">
@@ -301,6 +294,38 @@
         </div>
       </v-sheet>
     </v-navigation-drawer>
+    
+    <!-- privacy setup -->
+    <v-dialog
+      id="data-collection-popup-dialog"
+      v-model="showPrivacyDialog"
+      :scrim="false"
+      :persistent="true"
+      width="320px"
+      max-width="80vw"
+      :capture-focus="false"
+    >
+      <DataCollectionOptOut
+        v-model:show="showPrivacyDialog"
+        v-model:show-privacy-policy="showPrivacyPolicyInfo"
+        v-model:response-opt-out="responseOptOut"
+      />
+    </v-dialog>
+    
+    <v-dialog
+      id="cds-privacy-policy"
+      v-model="showPrivacyPolicyInfo"
+      class="cds-privacy-policy__dialog"
+      :scrim="false"
+      max-width="400px"
+      :capture-focus="false"
+    >
+      <CDSPrivacyPolicy
+        v-model="showPrivacyPolicyInfo" 
+        v-focus-return="showPrivacyDialog"
+        tabindex="-1"
+      />
+    </v-dialog>
 
     <!-- rating prompt, shown once a while after load (see useUserExperienceRating) -->
     <UserExperienceDialog
@@ -415,7 +440,7 @@ const accentColor2 = computed(() => theme.current.value.colors.secondary);
 
 const { xs } = useDisplay();
 
-import DataCollectionOptOutDialog from "./privacy/DataCollectionOptOutDialog.vue";
+import DataCollectionOptOut from "./privacy/DataCollectionOptOut.vue";
 import CDSPrivacyPolicy from "./privacy/CDSPrivacyPolicy.vue";
 import UserExperienceDialog from "./privacy/UserExperienceDialog.vue";
 import { usePrivacy } from "./privacy/usePrivacy";
@@ -459,7 +484,7 @@ const {
   optOut: optOutRating,
   updateUserExperienceInfo,
   initializePrompt,
-} = useUserExperienceRating(STORY_NAME, userID, { responseOptOut, timeout: 10_000, });
+} = useUserExperienceRating(STORY_NAME, userID, { responseOptOut, timeout: 1_000, });
 
 
 const showTour = ref(false);
@@ -842,4 +867,16 @@ body {
   transform: translateY(-256px);
 }
 */
+
+/* easier to just force it than wrestle with vuetify's built-in positioning */
+#data-collection-popup-dialog > .v-overlay__content {
+  position: fixed;
+  top: auto;
+  left: auto;
+  right: 1rem;
+  // keep above the icons
+  bottom: 3.5rem;
+  margin: 0;
+  padding: 0;
+}
 </style>

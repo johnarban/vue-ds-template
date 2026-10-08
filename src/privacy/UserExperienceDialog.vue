@@ -80,7 +80,8 @@ const emit = defineEmits<{
     }
     
     .v-btn.close-button {
-      position: static;
+      // override position absolute from the toolkit (which is also !important
+      position: static !important;
       top: unset;
       right: unset;
     }

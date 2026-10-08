@@ -92,3 +92,29 @@ you can do `yarn link -r` if you want relative paths
 so vuetify internally handles applying refocusing dialog activators. 
 if you put something in the activator slots, or assign the activator prop to an id, 
 that thing will get focus after the dialog closes
+but note that using the v-dialog activator does not give keyboard accessibility
+
+
+# Example 1
+ - using the composable to load a wtml with less boiler plate. 
+ 
+ The normal way to load a WMTL file
+ ```ts
+ 
+import { type ImageSetLayer } from "@wwtelescope/engine";
+
+const layer = ref<ImageSetLayer | null>(null)
+
+onMounted(() => {
+  store.waitForReady().then(async () => {
+    
+    store.
+    
+  })
+})
+
+ 
+ ```
+ 
+ 
+ put a gaurd on local storage

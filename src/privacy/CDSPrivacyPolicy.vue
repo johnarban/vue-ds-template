@@ -1,46 +1,40 @@
 <template>
-  <v-dialog
-    id="cds-privacy-policy"
-    v-model="showPrivacyDialog"
-    class="cds-privacy-policy__dialog"
-    :scrim="false"
-    max-width="400px"
+  <v-card
+    class="cds-privacy-policy__card"
   >
-    <v-card v-focus-return="showPrivacyDialog" class="cds-privacy-policy__card">
-      <div class="cds-privacy-policy__close">
-        <CloseButton 
-          class="cds-privacy-policy__close-icon" 
-          label="Close privacy policy dialog"
-          @click="showPrivacyDialog = false"
-        />
-      </div>
-      <v-card-text class="cds-privacy-policy__text">
-        <slot>
-          <p>
-            Your anonymous response will be used by the 
-            <a 
-              class="cds-privacy-policy__link"
-              href="https://www.cosmicds.cfa.harvard.edu/" 
-              rel="noopener noreferrer external" 
-              target="_blank"
-            >CosmicDS</a> team to improve the educational experience.
-          </p>
-          <p style="text-align: right; margin-top: 1em; font-size: 0.9em">
-            <a 
-              href="https://cfa.harvard.edu/privacy-statement" 
-              rel="noopener noreferrer external" 
-              target="_blank"
-            >Privacy Policy</a>
-          </p>
-        </slot>
-      </v-card-text>
-      
-    </v-card>
-  </v-dialog>
+    <div class="cds-privacy-policy__close">
+      <CloseButton
+        class="cds-privacy-policy__close-icon"
+        label="Close privacy policy dialog"
+        @click="showPrivacyDialog = false"
+      />
+    </div>
+    <v-card-text class="cds-privacy-policy__text">
+      <slot>
+        <p>
+          Your anonymous response will be used by the
+          <a
+            class="cds-privacy-policy__link"
+            href="https://www.cosmicds.cfa.harvard.edu/"
+            rel="noopener noreferrer external"
+            target="_blank"
+          >CosmicDS</a> team to improve the educational experience.
+        </p>
+        <p style="text-align: right; margin-top: 1em; font-size: 0.9em">
+          <a
+            href="https://cfa.harvard.edu/privacy-statement"
+            rel="noopener noreferrer external"
+            target="_blank"
+          >Privacy Policy</a>
+        </p>
+      </slot>
+    </v-card-text>
+
+  </v-card>
 </template>
 
 <script setup lang="ts">
- 
+
 import CloseButton from '@/components/CloseButton.vue';
 
 const showPrivacyDialog = defineModel<boolean>({default: false, required: true});
@@ -48,7 +42,7 @@ const showPrivacyDialog = defineModel<boolean>({default: false, required: true})
 </script>
 
 <style lang="css">
-#cds-privacy-policy {
+.cds-privacy-policy__card {
   font-size: 0.9em;
 }
 .cds-privacy-policy__close {
@@ -61,7 +55,7 @@ const showPrivacyDialog = defineModel<boolean>({default: false, required: true})
   margin-right: 0.25em;
 }
 
-#cds-privacy-policy.cds-privacy-policy__dialog .cds-privacy-policy__text {
+.cds-privacy-policy__card .cds-privacy-policy__text {
   margin: 0;
   padding-top: 0;
 }
