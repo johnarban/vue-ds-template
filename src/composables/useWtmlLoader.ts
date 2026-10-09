@@ -117,6 +117,8 @@ function looksLikeFits(imageset: Imageset): boolean {
  * Each place's foreground/study imageset is loaded and tracked separately from its
  * background imageset, if it has one - see {@link WtmlLoaderReturn}. FITS mode is
  * auto-detected per imageset from its declared file type.
+ * 
+ * Does not support loading child folders
  *
  * @param wtmlUrl - URL of the WTML file to load
  * @param options - see {@link WtmlLoaderOptions}
@@ -140,7 +142,7 @@ function looksLikeFits(imageset: Imageset): boolean {
  * crossfade.backgroundImagesetLayer; // e.g. JWST
  * ```
  */
-export function useWtmlLoader(
+export function useWtml(
   wtmlUrl: string,
   _options?: WtmlLoaderOptions
 ): Prettify<WtmlLoaderReturn> {
@@ -200,6 +202,7 @@ export function useWtmlLoader(
 
   const store = engineStore();
 
+  /**the type may be Thumbnails, but it may contain Folder's or FolderUps - this is why we filter */
   function thumbnails2Places(thumbnails: (ReturnType<Folder["get_children"]>)): Place[] {
     if (thumbnails == null) return [];
     return thumbnails.filter(child => child instanceof Place) as Place[];

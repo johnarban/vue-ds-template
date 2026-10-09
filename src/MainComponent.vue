@@ -412,7 +412,7 @@ import {
 } from "@cosmicds/vue-toolkit";
 
 import { useAppLayout } from "./composables/useAppLayout";
-import { useWtmlLoader } from "./composables/useWtmlLoader";
+import { useWtml } from "./composables/useWtmlLoader";
 
 const extraLogos = [
   {
@@ -490,7 +490,7 @@ store.waitForReady().then(() => {
 });
 
 
-const jwstCarina = useWtmlLoader("https://web.wwtassets.org/specials/2023/cosmicds-carina/collection/jwst_carina.wtml", {
+const jwstCarina = useWtml("https://web.wwtassets.org/specials/2023/cosmicds-carina/collection/jwst_carina.wtml", {
   single: true,
   goTo: false,
   onLoad: (out) => {
