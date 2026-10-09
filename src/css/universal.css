@@ -7,17 +7,6 @@
     if they do not want to edit the universal.css file directly.
 */
 
-/* font-awesome close (times) button */
-.fa-close-icon {
-  cursor: pointer;
-  aspect-ratio: 1/1;
-  width: auto;
-  transition: scale 0.2s ease-in-out;
-}
-.fa-close-icon:hover {
-  scale: 1.2;
-}
-
 
 /**
 Overrides needed for the v-navigation-drawer to respect the user's desired height

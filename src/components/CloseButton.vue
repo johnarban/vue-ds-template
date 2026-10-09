@@ -35,4 +35,16 @@ defineEmits<{ click: [] }>();
 button {
   line-height: 1;
 }
+
+/* font-awesome close (times) button */
+.fa-close-icon {
+  cursor: pointer;
+  aspect-ratio: 1/1;
+  width: auto;
+  transition: scale 0.2s ease-in-out;
+}
+.fa-close-icon:hover {
+  scale: 1.2;
+}
+
 </style>
