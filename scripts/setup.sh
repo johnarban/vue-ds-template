@@ -29,9 +29,9 @@ if [[ -e "$target" ]]; then
     exit 2
 fi
 
-# make the target folder and copy everything except .git, node_modules, and dist. 
+# make the target folder and copy the top-level files plus only the .github, src, public, and scripts folders
 mkdir -p "$target"
-rsync -a --exclude='.git' --exclude='node_modules' --exclude='dist' ./ "$target"/
+rsync -a --include='/.github/' --include='/src/' --include='/public/' --include='/scripts/' --exclude='/*/' ./ "$target"/
 
 cd "$target"
 

@@ -23,3 +23,12 @@ tsconfig.tsbuildinfo
 **/tests_output/**
 
 *.env
+
+
+.claude/
+agents/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
