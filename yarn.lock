@@ -2434,6 +2434,7 @@ __metadata:
     "@mdi/font": "npm:^7.4.47"
     "@types/node": "npm:^25.9.8"
     "@vitejs/plugin-vue": "npm:^6.0.9"
+    "@vueuse/core": "npm:^13.1.0"
     "@wwtelescope/engine": "npm:^7.40.0"
     "@wwtelescope/engine-pinia": "npm:^0.16.0"
     eslint: "npm:^10.11.0"

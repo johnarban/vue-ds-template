@@ -25,6 +25,6 @@ Overrides needed for the v-navigation-drawer to respect the user's desired heigh
   height: var(--drawer-bottom-height) !important;
 }
 .v-main:has(+.v-navigation-drawer--active.drawer-bottom) {
-  /* --v-layout-bottom: var(--drawer-bottom-height) !important; */
+  --v-layout-bottom: var(--drawer-bottom-height) !important;
   padding-bottom:var(--drawer-bottom-height);
 }

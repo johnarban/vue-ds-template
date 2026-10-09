@@ -118,3 +118,8 @@ onMounted(() => {
  
  
  put a gaurd on local storage
+ 
+add a simple WCS to WTML converter
+ - adding images
+ - cross-fade
+ 

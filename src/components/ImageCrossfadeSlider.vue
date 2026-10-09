@@ -79,7 +79,6 @@ defineSlots<{
   pointer-events: auto;
   width: 50%;
   max-width: 400px;
-  align-self: center;
 
 
   .crossfade-label {

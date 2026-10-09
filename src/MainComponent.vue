@@ -38,8 +38,7 @@
       <div id="main-content">
         <WorldWideTelescope :wwt-namespace="wwtNamespace"></WorldWideTelescope>
         <wwt-loader v-model="isLoading" />
-        <div id="tour-floating-location" />
-        
+
         <!-- This block contains the elements (e.g. icon buttons displayed at/near the top of the screen) -->
 
         <div v-show="!showSplashScreen" id="wwt-overlay">
@@ -51,18 +50,16 @@
              it uses slotted styles so it's specificiy is (0,2,0)
               -->
               <icon-button
-                v-model="showTextSheet"
                 icon="book-open"
-                :aria-label="showTextSheet ? 'Hide Info' : 'Learn More'"
+                aria-label="Learn More"
                 :color="accentColor"
                 :focus-color="accentColor"
-                :tooltip-text="showTextSheet ? 'Hide Info' : 'Learn More'"
+                tooltip-text="Learn More"
                 tooltip-location="start"
                 size="lg"
-              >
-              </icon-button>
+                @activate="() => openInfoSheetTab('information')"
+              />
               <icon-button
-                v-model="showUserGuideSheet"
                 icon="question"
                 aria-label="User guide"
                 :color="accentColor"
@@ -70,6 +67,17 @@
                 tooltip-text="User guide"
                 tooltip-location="start"
                 size="lg"
+                @activate="() => openInfoSheetTab('user-guide')"
+              />
+              <icon-button
+                icon="mdi-shape-outline"
+                aria-label="Example"
+                :color="accentColor"
+                :focus-color="accentColor"
+                tooltip-text="Example"
+                tooltip-location="start"
+                size="lg"
+                @activate="() => openInfoSheetTab('example')"
               />
 
               <icon-button
@@ -96,30 +104,6 @@
             </div>
             <div id="center-buttons"></div>
             <div id="right-buttons">
-              <ClosableDialog
-                max-width="400"
-                title="Settings"
-              >
-                <template #activator="{ props }">
-                  <icon-button
-                    icon="image"
-                    aria-label="Settings"
-                    :color="accentColor"
-                    :focus-color="accentColor"
-                    tooltip-text="Settings"
-                    tooltip-location="start"
-                    size="lg"
-                    :activator-props="props"
-                  />
-                </template>
-                <v-select
-                  v-model="backgroundImagesetName"
-                  :items="backgroundItems"
-                  label="Background imagery"
-                  variant="outlined"
-                  density="compact"
-                />
-              </ClosableDialog>
               <ShareButton
                 :source="urlState.getUrl"
                 :tooltip="false"
@@ -137,72 +121,21 @@
                   />
                 </template>
               </ShareButton>
-              <Gallery
-                :store="store"
-                wtml-url="https://raw.githubusercontent.com/johnarban/data_repo/main/hubble_famous.wtml"
-                @select="onGallerySelect"
-              >
-                <template #preview="{ place, thumbnailUrl, selected }">
-                  <!-- fill with the image, and add the labe. highilight if selected -->
-                  <div :class="['gallery-preview', { selected }]">
-                    <img
-                      class="gallery-preview-image"
-                      :src="thumbnailUrl"
-                      :alt="place.get_name()"
-                    >
-                    <div class="gallery-preview-overlay">
-                      <span class="gallery-preview-title">{{ place.get_name() }}</span>
-                    </div>
-                  </div>
-                </template>
-              </Gallery>
-              <FolderView
-                root-url="https://raw.githubusercontent.com/johnarban/data_repo/main/hubble_jwst_famous.wtml"
-                orientation="column"
-                background-color="rgba(0, 0, 0, 0.4)"
-                thumbnail-color="rgba(0, 0, 0, 0.4)"
-                :text-color="accentColor"
-                :lazy="false"
-                @select="onFolderViewSelect"
-              />
             </div>
           </div>
 
           <div id="bottom-content">
-            <!-- even though this is absolutely positioned, 
-           we place it in the flow so that tabbing hits this before the credit logos -->
-            <div
-              v-show="!showPrivacyDialog"
-              id="privacy-lock"
-            >
-              <icon-button
-                icon="mdi-lock"
-                aria-label="Change privacy settings"
-                :color="accentColor"
-                :focus-color="accentColor"
-                :border="false"
-                size="0.5em"
-                tooltip-text="Change privacy settings"
-                :show-tooltip="!xs"
-                tooltip-location="start"
-                tooltip-offset="5px"
-                @activate="showPrivacyDialog = true"
-              ></icon-button>
-            </div>
+            <!-- Tab order lands here whether the tour is docked in the drawer right
+                 below or floating out of it, so focus order doesn't jump around when
+                 the layout switches between the two. -->
+            <div id="tour-floating-location" />
             <!-- example: crossfade between the Hubble and JWST views of the Carina Nebula -->
-            <ImageCrossfadeSlider
-              v-if="hubbleLayer && jwstCarina.imagesetLayer"
-              :left="hubbleLayer"
+            <image-crossfade-slider
+              v-if="showTour && tour.stepID.value === 'carina' && hstCarina.imagesetLayer && jwstCarina.imagesetLayer"
+              :left="hstCarina.imagesetLayer"
               :right="jwstCarina.imagesetLayer"
               left-label="Hubble"
               right-label="Webb"
-            />
-            <!-- credit logos id=logo-credits -->
-            <credit-logos
-              v-if="!xs"
-              :default-logos="['cosmicds', 'wwt', 'nasa']"
-              :logo-size="xs ? '1.5em' : '2em'"
-              :extra-logos="extraLogos"
             />
           </div>
         </div>
@@ -214,8 +147,8 @@
     It's an in-flow flex sibling of #main-content, so opening it shrinks the WWT view
     (from the side normally, from the bottom on small screens) instead of covering it.
   -->
-    
-    <!-- 
+
+    <!--
     the drawer pushes the view rather than covering it  to have it cover the view set temporary=true.
     By default Vuetify makes the drawer cover the view below a certain window width,
     no matter what temporary is set to. mobile-breakpoint=0 turns that off, so temporary
@@ -272,8 +205,7 @@
         id="side-panel-sheet"
         v-model:tab="infoSheetTab"
         v-focus-toggle="showTextSheet"
-        align-tabs="start"
-        compact-tabs
+        hide-tabs
         @close="showTextSheet = false"
       >
         <!-- tab-page content is wrapped in a .tab-page class  -->
@@ -284,17 +216,12 @@
           <p>Sample Science Information</p>
         </tab-page>
 
-        <!-- 
-        Example of an Info Page with a stable footer and scrollable upper section. 
+        <!--
+        Example of an Info Page with a stable footer and scrollable upper section.
         -->
         <tab-page title="Example" name="example">
           <div class="ip-example-header">[Optional] This will stay at the top</div>
-          <div class="flex-grow-1 overflow-y-auto my-5 bg-red">
-            <p>This will fill the middle and scroll if needed.</p>
-            <p>The <code>flex-grow: 1</code>, causes it to fill the parent's height because the parent
-              <code>.tab-page</code> is <code>display: flex</code></p>
-            <p v-for="i in 100" :key="i">This is line {{ i }}</p>
-          </div>
+          <div class="ip-example-body flex-grow-1 overflow-y-auto my-5" />
           <div class="ip-example-footer">This will stay at the bottom</div>
         </tab-page>
 
@@ -302,27 +229,17 @@
          it can be userful to move complex content into a separate component
          -->
         <tab-page title="User Guide" value="user-guide">
-          <user-guide />
-        </tab-page>
-
-        <tab-page title="WTMLs" value="wtmls">
-          <v-list>
-            <v-list-item
-              v-for="item in wtmlItems"
-              :key="item.imageset.get_name()"
-              :title="item.imageset.get_name()"
-              @click="gotoItem(item)"
-            />
-          </v-list>
+          <user-guide @change-privacy-settings="showPrivacyDialog = true" />
         </tab-page>
       </tabbed-sheet>
-      
-      <!-- 
-        You don't have to use the tabbed sheet though. 
+
+      <!--
+        You don't have to use the tabbed sheet though.
         If you would rather just have single sheets, controlled by their own button, or something else
         just use a v-sheet (provides the card colors) and make it a
         flex-column with 100% height.
       -->
+      <!--
       <v-sheet
         v-if="showUserGuideSheet"
         v-focus-toggle="showUserGuideSheet"
@@ -330,20 +247,19 @@
         height="100%"
         tabindex="-1"
       >
-        <!-- A header with a close button to he right -->
         <div class="d-flex align-center justify-space-between pa-3">
           <h3>User Guide</h3>
-          <CloseButton
+          <close-button
             label="Close User Guide"
             color="primary"
             @click="showUserGuideSheet = false"
           />
         </div>
-        <!-- div.page-sheet-body fills the flex column and is scrollable -->
         <div class="page-sheet-body">
-          <user-guide />
+          <user-guide @change-privacy-settings="showPrivacyDialog = true" />
         </div>
       </v-sheet>
+      -->
     </v-navigation-drawer>
     
     <!-- privacy setup -->
@@ -391,15 +307,28 @@
       @opt-out="optOutRating"
       @what-is-this="showPrivacyPolicyInfo = true"
     />
+    
+    
+    <!-- credit logos $logo-credits.cds-bottom-credits -->
+    <!-- 
+      we want this at the end of the DOM tree so that is last in tab order.
+      but this also means it is highest in z-order, so if it appears on top of 
+      something it should not. give that other thing a higher z-index.
+      -->
+    <credit-logos
+      v-if="!xs"
+      class="cds-bottom-credits"
+      :default-logos="['cosmicds', 'wwt', 'nasa']"
+      :logo-size="xs ? '1.5em' : '2em'"
+      :extra-logos="extraLogos"
+    />
   </v-app>
 </template>
 
 <script setup lang="ts">
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { ref, reactive, computed, onMounted, watch, nextTick } from "vue";
+import { ref, computed, onMounted } from "vue";
 import type { StyleValue } from "vue";
-import { WWTControl, Coordinates, Place, Imageset, type ImageSetLayer } from "@wwtelescope/engine";
-import { ImageSetType, ProjectionType, type Thumbnail } from "@wwtelescope/engine-types";
+import { WWTControl, Coordinates } from "@wwtelescope/engine";
 import { D2R } from "@wwtelescope/astro";
 import { GotoRADecZoomParams, WWTComponent as WorldWideTelescope, engineStore } from "@wwtelescope/engine-pinia";
 import {
@@ -407,8 +336,6 @@ import {
   IconButton,
   CreditLogos,
   ShareButton,
-  Gallery,
-  FolderView,
 } from "@cosmicds/vue-toolkit";
 
 import { useAppLayout } from "./composables/useAppLayout";
@@ -431,12 +358,20 @@ const store = engineStore();
 
 useWWTKeyboardControls(store);
 
-// example of loading state. 
+// example of loading state.
 import { useUrlState } from "./composables/useUrlState";
 const urlState = useUrlState({ autoUpdate: true, inAddressBar: true, clearOnLoad: false });
 
+// camera position in the url, in degrees. zoom is store.zoomDeg / 6 (vertical FOV convention).
+import { refThrottled } from "@vueuse/core";
+const raDeg = refThrottled(computed(() => (store.raRad * 180 / Math.PI).toFixed(4)), 500);
+const decDeg = refThrottled(computed(() => (store.decRad * 180 / Math.PI).toFixed(4)), 500);
+const zoom = refThrottled(computed(() => (store.zoomDeg / 6).toFixed(4)), 500);
+urlState.track("ra", raDeg);
+urlState.track("dec", decDeg);
+urlState.track("zoom", zoom);
 
-const { smallSize, sidePanel, viewportWidth } = useAppLayout();
+const { smallSize, sidePanel, floatingPanel: floatingTour, viewportWidth } = useAppLayout();
 const DRAWER_WIDTH_FRACTION = 34; // 34% of the viewport width
 const drawerWidth = computed(() => Math.round(viewportWidth.value * DRAWER_WIDTH_FRACTION / 100.));
 
@@ -445,11 +380,11 @@ withDefaults(defineProps<MainComponentProps>(), {
 });
 
 const GALACTIC_CENTER = Coordinates.galactictoJ2000(0, 0);
-const _initialCameraParams = {
-  raRad: GALACTIC_CENTER[0] * D2R,
-  decRad: GALACTIC_CENTER[1] * D2R,
-  zoomDeg: 360,
-} as Omit<GotoRADecZoomParams, "instant">;
+const _initialCameraParams = (
+  urlState.loadedFromUrl?.value.includes("ra")
+    ? { raRad: parseFloat(raDeg.value) * D2R, decRad: parseFloat(decDeg.value) * D2R, zoomDeg: parseFloat(zoom.value) * 6 }
+    : { raRad: GALACTIC_CENTER[0] * D2R, decRad: GALACTIC_CENTER[1] * D2R, zoomDeg: 360 }
+) as Omit<GotoRADecZoomParams, "instant">;
 
 const splash = new URLSearchParams(window.location.search).get("splash")?.toLowerCase() !== "false";
 const showSplashScreen = ref(splash);
@@ -458,124 +393,15 @@ const showVideo = ref(false);
 
 const showWebGL2Warning = ref(false);
 
-/* Two different ways of doing the same thing.
- */
-const hubbleLayer = ref<ImageSetLayer | null>(null);
-
-interface WtmlListItem {
-  place: Place;
-  imageset: Imageset;
-}
-
-const wtmlItems = ref<WtmlListItem[]>([]);
-
-store.waitForReady().then(() => {
-  store.loadImageCollection({
-    url: "https://web.wwtassets.org/specials/2023/cosmicds-carina/collection/carina_nebula.wtml",
-    loadChildFolders: false,
-  }).then((folder) => {
-    const place = folder.get_children()?.[0] as Place;
-    const imageset = place?.get_backgroundImageset() ?? place?.get_studyImageset();
-    if (imageset == null) return;
-    store.addImageSetLayer({
-      url: imageset.get_url(),
-      mode: "autodetect",
-      name: imageset.get_name(),
-      goto: false,
-    }).then((layer) => {
-      hubbleLayer.value = store.imagesetLayerById(layer.id.toString()) ?? null;
-      wtmlItems.value.push({ place, imageset });
-    });
-  });
+const hstCarina = useWtml("https://web.wwtassets.org/specials/2023/cosmicds-carina/collection/carina_nebula.wtml", {
+  single: true,
+  goTo: false,
 });
-
 
 const jwstCarina = useWtml("https://web.wwtassets.org/specials/2023/cosmicds-carina/collection/jwst_carina.wtml", {
   single: true,
   goTo: false,
-  onLoad: (out) => {
-    wtmlItems.value.push({ place: out.place, imageset: out.imageset });
-  },
 });
-
-store.waitForReady().then(() => {
-  store.loadImageCollection({
-    url: "https://raw.githubusercontent.com/johnarban/data_repo/main/hubble_famous.wtml",
-    loadChildFolders: false,
-  }).then((folder) => {
-    const places = (folder.get_children() ?? []) as Place[];
-    places.forEach((place) => {
-      const imageset = place.get_backgroundImageset() ?? place.get_studyImageset();
-      if (imageset == null) return;
-      store.addImageSetLayer({
-        url: imageset.get_url(),
-        mode: "autodetect",
-        name: imageset.get_name(),
-        goto: false,
-      }).then(() => {
-        wtmlItems.value.push({ place, imageset });
-      });
-    });
-  });
-});
-
-function gotoItem(item: WtmlListItem) {
-  store.gotoRADecZoom({
-    raRad: item.place.get_RA() * 15 * D2R,
-    decRad: item.place.get_dec() * D2R,
-    zoomDeg: item.place.get_zoomLevel(),
-    rollRad: item.imageset.get_rotation() * D2R,
-    instant: true,
-  });
-}
-
-const selectedPlaceLayer = ref<ImageSetLayer | null>(null);
-
-
-function getLayerForImageset(imgset: Imageset): ImageSetLayer | null {
-  for (const guid of store.activeLayers) {
-    const iset = store.imagesetForLayer(guid); // just returns the Imageset not the layer
-    if (iset && iset.get_imageSetID() === imgset.get_imageSetID()) {
-      return store.imagesetLayerById(guid); // returns plain, non-reactive ImageSetLayer
-    }
-  }
-  return null;
-}
-
-function selectPlace(place: Place) {
-  const imageset = place.get_backgroundImageset() ?? place.get_studyImageset();
-  if (imageset == null) return;
-
-  selectedPlaceLayer.value?.set_enabled(false);
-
-  const existingLayer = getLayerForImageset(imageset);
-  if (existingLayer) {
-    existingLayer.set_enabled(true);
-    selectedPlaceLayer.value = existingLayer;
-  } else {
-    store.addImageSetLayer({
-      url: imageset.get_url(),
-      mode: "autodetect",
-      name: imageset.get_name(),
-      goto: false,
-    }).then((layer) => {
-      selectedPlaceLayer.value = store.imagesetLayerById(layer.id.toString()) ?? null;
-    });
-  }
-  gotoItem({ place, imageset });
-}
-
-function onGallerySelect(place: Place) {
-  selectPlace(place);
-  return true; // return true to close the gallery after selections
-}
-
-function onFolderViewSelect({ item }: { item: Thumbnail }) {
-  if (item instanceof Place) {
-    selectPlace(item);
-  }
-}
-
 
 
 import { useTheme, useDisplay } from "vuetify";
@@ -632,11 +458,10 @@ const {
   optOut: optOutRating,
   updateUserExperienceInfo,
   initializePrompt,
-} = useUserExperienceRating(STORY_NAME, userID, { responseOptOut, timeout: 1_000, });
+} = useUserExperienceRating(STORY_NAME, userID, { responseOptOut, timeout: 10_000, });
 
 
 const showTour = ref(false);
-const floatingTour = ref(false);
 
 import {
   TourSheet,
@@ -699,12 +524,6 @@ function startTour() {
 // urlState.track("step", tour.stepIndex);
 
 
-const backgroundItems = ref<{ title: string; value: string }[]>([]);
-const backgroundImagesetName = computed({
-  get: () => store.backgroundImageset?.get_name(),
-  set: (name: string) => store.setBackgroundImageByName(name),
-});
-
 onMounted(() => {
   if (showWebGL2Warning.value) {
     showSplashScreen.value = false;
@@ -714,19 +533,13 @@ onMounted(() => {
   }
 
   store.waitForReady().then(async () => {
-    // store.gotoRADecZoom({
-    //   ..._initialCameraParams,
-    //   instant: true,
-    // }).then(() => (positionSet.value = true));
-    positionSet.value = true;
+    store.gotoRADecZoom({
+      ..._initialCameraParams,
+      instant: true,
+    }).then(() => (positionSet.value = true));
 
     // If there are layers to set up, do that here!
     layersLoaded.value = true;
-      
-    // grab all the all-sky (TOAST-projected) images
-    backgroundItems.value = WWTControl.getImageSets()
-      .filter((iset) => iset.get_dataSetType() === ImageSetType.sky && iset.get_projection() === ProjectionType.toast)
-      .map((iset) => ({ title: iset.get_name(), value: iset.get_name() }));
 
     createUserEntry();
     initializePrompt();
@@ -762,7 +575,6 @@ const cssVars = computed(() => {
 const showTextSheet = ref(false);
 const infoSheetTab = ref("");
 /** open a tab on the info sheet */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function openInfoSheetTab(tabValue: string) {
   infoSheetTab.value = tabValue;
   showTextSheet.value = true;
@@ -886,9 +698,6 @@ body {
 #wwt-overlay > * {
   // turns each item in #wwt-overlay into a stacking context
   isolation: isolate;
-  > div {
-    background-color: rgba(0, 0, 0, 0.4);
-  }
 }
 
 #top-content {
@@ -916,17 +725,24 @@ body {
 
 #bottom-content {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   width: 100%;
   pointer-events: auto;
-  align-items: flex-end;
+  justify-content: flex-start;
+  align-items: center;
   gap: 1rem;
 
-  // neither #logo-credits nor #icons-container are flex
-  #logo-credits > #icons-container {
-    a {
-      margin-inline: 0.3em;
-    }
+}
+
+// neither #logo-credits nor #icons-container are flex
+#logo-credits.cds-bottom-credits {
+  position: fixed;
+  bottom: 0.5rem;
+  right: 0.5rem;
+}
+#logo-credits.cds-bottom-credits > #icons-container {
+  a {
+    margin-inline: 0.3em;
   }
 }
 
@@ -977,46 +793,16 @@ body {
   padding: 0 1rem 1rem;
 }
 
-/* Small and quiet in the corner, clearing #logo-credits in the same corner
-   (same bottom offset the dialog above uses — the two never show at once).
-   Absolute, so the overlay's flex column still distributes only top and
-   bottom content. */
-#privacy-lock {
-  position: absolute;
-  left: 1rem;
-  bottom: 1rem;
-  pointer-events: none;
-  .icon-wrapper {
-    background-color: rgba(0,0,0, 0.6);
-  }
-}
-
-/* make the tour float. This means pulling it of the
-  flex layout and giving it a fixed position. 
-  the width and transform are indepen
-*/
+/* make the tour float: pull it out of the drawer (via Teleport) and into
+  #bottom-content, so it lays out in that flex row alongside whatever else
+  is down there (e.g. the crossfade slider) instead of covering it. */
 .floating-tour.tour-text {
-  position: fixed;
-  --horizontal-offset: 1rem;
-  --vertical-offset: 7rem;
-  bottom: var(--vertical-offset);
-  left: var(--horizontal-offset);
+  flex: 0 1 auto;
   width: 30vw;
-  max-width: calc(100vw - 2 * var(--horizontal-offset));
+  max-width: calc(100vw - 2rem);
   min-height: 0;
   max-height: 400px;
-  z-index: 10000 !important;
 }
-/* 
-// since we are using Teleport, it is no longer a child of the drawer
-// so these will have no effect
-.drawer-side .floating-tour.tour-text {
-  transform: translateX(var(--drawer-width));
-}
-.drawer-bottom .floating-tour.tour-text {
-  transform: translateY(-256px);
-}
-*/
 
 /* easier to just force it than wrestle with vuetify's built-in positioning */
 #data-collection-popup-dialog > .v-overlay__content {
@@ -1030,45 +816,8 @@ body {
   padding: 0;
 }
 
-.gallery-preview {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  overflow: hidden;
-  border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-
-  &:hover {
-    transform: scale(1.04);
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.6);
-  }
-
-  &.selected {
-    box-shadow: 0 0 0 3px var(--selected-color, dodgerblue);
-  }
-}
-
-.gallery-preview-image {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.gallery-preview-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: flex-end;
-  padding: 6px 8px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0) 65%);
-}
-
-.gallery-preview-title {
-  color: white;
-  font-size: 10pt;
-  line-height: 1.2;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+.ip-example-body {
+  height: 2000px;
+  background: linear-gradient(to bottom, var(--accent-color), var(--accent-color-2));
 }
 </style>

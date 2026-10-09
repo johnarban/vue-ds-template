@@ -99,6 +99,20 @@
         <v-spacer class="end-spacer"></v-spacer>
       </v-col>
     </v-row>
+    <v-row>
+      <v-col cols="12">
+        <slot name="privacy-settings">
+          <v-btn
+            prepend-icon="mdi-lock"
+            variant="tonal"
+            size="small"
+            @click="emit('change-privacy-settings')"
+          >
+            Change Privacy Settings
+          </v-btn>
+        </slot>
+      </v-col>
+    </v-row>
     <v-row class="mt-auto">
       <!-- pinned to the bottom of the sheet -->
       <v-col>
@@ -119,6 +133,8 @@ const easyLink = (props: { href: string }, { slots }: SetupContext) => {
 };
 
 const { touchscreen } = useAppLayout();
+
+const emit = defineEmits<(e: "change-privacy-settings") => void>();
 </script>
 
 <style scoped>
