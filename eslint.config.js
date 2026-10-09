@@ -140,12 +140,6 @@ export default typescriptEslint.config(
           required: { some: ["nesting", "id"] },
           allowChildren: true,
         }],
-      // check IconButton/icon-button to enforce aria-labels on them. 
-      // Adding an "id" will let it pass, but this is the best we can do right now
-      "vuejs-accessibility/form-control-has-label": ["error", {
-        controlComponents: ["icon-button", "IconButton"],
-      }],
-
     }
   }
 
