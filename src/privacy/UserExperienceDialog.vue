@@ -56,6 +56,7 @@ const emit = defineEmits<{
   position: absolute !important;
   right: 5px;
   bottom: 5px;
+  z-index: 9999;
   // padding: 1em;
   // outline: 1px solid rgba(var(--v-theme-on-background), .5) !important;
   // width: fit-content !important;

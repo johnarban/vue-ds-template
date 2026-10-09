@@ -10,7 +10,14 @@
     aria-modal="false"
     aria-labelledby="data-collection-notice-text"
     tabindex="-1"
-  >
+  > 
+    <close-button
+      class="dc-close-button"
+      label="Close privacy notice"
+      @click="() => {
+        showPrivacyDialog = false;
+      }"
+    />
     <v-card-text id="data-collection-notice-text">
       To evaluate usage of this app, <strong>anonymized</strong> data may be collected.
     </v-card-text>
@@ -91,5 +98,10 @@ const responseOptOut = defineModel<boolean | null>('responseOptOut',{default: nu
   text-transform: none;
 }
 
+#data-collection-card .dc-close-button {
+  position: absolute;
+  top: 0.5em;
+  right: 0.5em;
+}
 
 </style>
