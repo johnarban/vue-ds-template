@@ -51,6 +51,7 @@ rm -f MainComponent.vue.bak
 cd ..
 sed -i.bak "s/CosmicDS data story template/$pascal_case_name/g" index.html
 sed -i.bak "s/CosmicDS Vue template/$title/g" index.html
+sed -i.bak "s/vue-ds-template/$name/g" index.html
 rm -f index.html.bak
 
 cd public

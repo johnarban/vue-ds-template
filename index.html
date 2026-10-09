@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+  <meta charset="utf-8">
   <!-- Google Analytics -->
   <script>
     // Logic derived from https://stackoverflow.com/a/61839170
@@ -24,21 +25,6 @@
       gtag('config', 'G-C2ELSYY9VC');
     }
   </script>
-  
-  <script>
-    // webgl detection block
-    function isWebGL2Enabled() {
-      // It doesn't seem like there's a better way to do this than just to try and get a context
-      // https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/By_example/Detect_WebGL
-      // NB: The engine specifically wants a webgl2 context
-      const canvas = document.createElement("canvas");
-      const gl = canvas.getContext("webgl2");
-      return gl instanceof WebGL2RenderingContext;
-    }
-
-    // read by WebGlTest.vue; nothing is blocked from loading here
-    window.showWebGL2Warning = !isWebGL2Enabled();
-  </script>
 
   <!-- Declared here once for the whole app rather than in MainComponent's stylesheet, since
        component stylesheets are unscoped and this avoids re-declaring it if that content ever
@@ -53,30 +39,28 @@
       font-display: swap;
     }
   </style>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A starter template for Cosmic Data Stories, built with Vue and WorldWide Telescope. Bring your own data, and create your own interactive story!">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://projects.cosmicds.cfa.harvard.edu/vue-ds-template/">
   <meta property="og:title" content="CosmicDS Vue template">
-  <meta property="og:description" content="CosmicDS Vue template">
-  <meta property="og:site_name" content="CosmicDS Vue template">
+  <meta property="og:description" content="A starter template for Cosmic Data Stories, built with Vue and WorldWide Telescope. Bring your own data, and create your own interactive story!">
+  <meta property="og:site_name" content="Cosmic Data Stories">
   <meta property="og:image" content="https://projects.cosmicds.cfa.harvard.edu/vue-ds-template/preview.png">
-  <meta property="og:image:secure_url" content="https://projects.cosmicds.cfa.harvard.edu/vue-ds-template/preview.png">
-  <meta property="og:image:type" content="image/jpeg">
-  <meta property="og:image:width" content="596">
-  <meta property="og:image:height" content="886">
-  <meta property="og:image:alt" content="Story preview image">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="960">
+  <meta property="og:image:height" content="504">
+  <meta property="og:image:alt" content="Hubble's image of the Crab Nebula, show on the sky in WorldWide Telescope ">
   <meta name="twitter:site" content="@CosmicDataStory">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:creator" content="@CosmicDataStory">
-  <meta name="twitter:image" content="https://projects.cosmicds.cfa.harvard.edu/vue-ds-template/preview.png">
   <link rel="icon" href="https://projects.cosmicds.cfa.harvard.edu/cds-website/cosmicds-favicon.png">
   <link rel="apple-touch-icon" href="https://projects.cosmicds.cfa.harvard.edu/cds-website/cosmicds-favicon-57.png">
   <link rel="apple-touch-icon" sizes="72x72" href="https://projects.cosmicds.cfa.harvard.edu/cds-website/cosmicds-favicon-72.png">
   <link rel="apple-touch-icon" sizes="114x114" href="https://projects.cosmicds.cfa.harvard.edu/cds-website/cosmicds-favicon-114.png">
   <link rel="apple-touch-icon" sizes="144x144" href="https://projects.cosmicds.cfa.harvard.edu/cds-website/cosmicds-favicon-144.png">
   <link rel="shortcut icon" href="https://projects.cosmicds.cfa.harvard.edu/cds-website/cosmicds-favicon.ico">
+  <link rel="canonical" href="https://projects.cosmicds.cfa.harvard.edu/vue-ds-template/">
   <meta name="apple-mobile-web-app-title" content="CosmicDS Vue template">
   <link rel="manifest" href="site.webmanifest">
   <title>CosmicDS Vue template</title>
