@@ -137,6 +137,34 @@
                   />
                 </template>
               </ShareButton>
+              <Gallery
+                :store="store"
+                wtml-url="https://raw.githubusercontent.com/johnarban/data_repo/main/hubble_famous.wtml"
+                @select="onGallerySelect"
+              >
+                <template #preview="{ place, thumbnailUrl, selected }">
+                  <!-- fill with the image, and add the labe. highilight if selected -->
+                  <div :class="['gallery-preview', { selected }]">
+                    <img
+                      class="gallery-preview-image"
+                      :src="thumbnailUrl"
+                      :alt="place.get_name()"
+                    >
+                    <div class="gallery-preview-overlay">
+                      <span class="gallery-preview-title">{{ place.get_name() }}</span>
+                    </div>
+                  </div>
+                </template>
+              </Gallery>
+              <FolderView
+                root-url="https://raw.githubusercontent.com/johnarban/data_repo/main/hubble_jwst_famous.wtml"
+                orientation="column"
+                background-color="rgba(0, 0, 0, 0.4)"
+                thumbnail-color="rgba(0, 0, 0, 0.4)"
+                :text-color="accentColor"
+                :lazy="false"
+                @select="onFolderViewSelect"
+              />
             </div>
           </div>
 
@@ -276,6 +304,17 @@
         <tab-page title="User Guide" value="user-guide">
           <user-guide />
         </tab-page>
+
+        <tab-page title="WTMLs" value="wtmls">
+          <v-list>
+            <v-list-item
+              v-for="item in wtmlItems"
+              :key="item.imageset.get_name()"
+              :title="item.imageset.get_name()"
+              @click="gotoItem(item)"
+            />
+          </v-list>
+        </tab-page>
       </tabbed-sheet>
       
       <!-- 
@@ -359,8 +398,8 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ref, reactive, computed, onMounted, watch, nextTick } from "vue";
 import type { StyleValue } from "vue";
-import { WWTControl, Coordinates, type ImageSetLayer } from "@wwtelescope/engine";
-import { ImageSetType, ProjectionType } from "@wwtelescope/engine-types";
+import { WWTControl, Coordinates, Place, Imageset, type ImageSetLayer } from "@wwtelescope/engine";
+import { ImageSetType, ProjectionType, type Thumbnail } from "@wwtelescope/engine-types";
 import { D2R } from "@wwtelescope/astro";
 import { GotoRADecZoomParams, WWTComponent as WorldWideTelescope, engineStore } from "@wwtelescope/engine-pinia";
 import {
@@ -368,6 +407,8 @@ import {
   IconButton,
   CreditLogos,
   ShareButton,
+  Gallery,
+  FolderView,
 } from "@cosmicds/vue-toolkit";
 
 import { useAppLayout } from "./composables/useAppLayout";
@@ -417,9 +458,16 @@ const showVideo = ref(false);
 
 const showWebGL2Warning = ref(false);
 
-/* Two different ways of doing the same thing. 
+/* Two different ways of doing the same thing.
  */
 const hubbleLayer = ref<ImageSetLayer | null>(null);
+
+interface WtmlListItem {
+  place: Place;
+  imageset: Imageset;
+}
+
+const wtmlItems = ref<WtmlListItem[]>([]);
 
 store.waitForReady().then(() => {
   store.loadImageCollection({
@@ -436,15 +484,99 @@ store.waitForReady().then(() => {
       goto: false,
     }).then((layer) => {
       hubbleLayer.value = store.imagesetLayerById(layer.id.toString()) ?? null;
+      wtmlItems.value.push({ place, imageset });
     });
-});
+  });
 });
 
 
 const jwstCarina = useWtmlLoader("https://web.wwtassets.org/specials/2023/cosmicds-carina/collection/jwst_carina.wtml", {
   single: true,
   goTo: false,
+  onLoad: (out) => {
+    wtmlItems.value.push({ place: out.place, imageset: out.imageset });
+  },
 });
+
+store.waitForReady().then(() => {
+  store.loadImageCollection({
+    url: "https://raw.githubusercontent.com/johnarban/data_repo/main/hubble_famous.wtml",
+    loadChildFolders: false,
+  }).then((folder) => {
+    const places = (folder.get_children() ?? []) as Place[];
+    places.forEach((place) => {
+      const imageset = place.get_backgroundImageset() ?? place.get_studyImageset();
+      if (imageset == null) return;
+      store.addImageSetLayer({
+        url: imageset.get_url(),
+        mode: "autodetect",
+        name: imageset.get_name(),
+        goto: false,
+      }).then(() => {
+        wtmlItems.value.push({ place, imageset });
+      });
+    });
+  });
+});
+
+function gotoItem(item: WtmlListItem) {
+  store.gotoRADecZoom({
+    raRad: item.place.get_RA() * 15 * D2R,
+    decRad: item.place.get_dec() * D2R,
+    zoomDeg: item.place.get_zoomLevel(),
+    rollRad: item.imageset.get_rotation() * D2R,
+    instant: true,
+  });
+}
+
+const selectedPlaceLayer = ref<ImageSetLayer | null>(null);
+
+
+function getLayerForImageset(imgset: Imageset): ImageSetLayer | null {
+  for (const guid of store.activeLayers) {
+    const iset = store.imagesetForLayer(guid); // just returns the Imageset not the layer
+    if (iset && iset.get_imageSetID() === imgset.get_imageSetID()) {
+      return store.imagesetLayerById(guid); // returns plain, non-reactive ImageSetLayer
+    }
+  }
+  return null;
+}
+
+function selectPlace(place: Place) {
+  const imageset = place.get_backgroundImageset() ?? place.get_studyImageset();
+  if (imageset == null) return;
+
+  selectedPlaceLayer.value?.set_enabled(false);
+
+  const existingLayer = getLayerForImageset(imageset);
+  if (existingLayer) {
+    existingLayer.set_enabled(true);
+    selectedPlaceLayer.value = existingLayer;
+  } else {
+    store.addImageSetLayer({
+      url: imageset.get_url(),
+      mode: "autodetect",
+      name: imageset.get_name(),
+      goto: false,
+    }).then((layer) => {
+      selectedPlaceLayer.value = store.imagesetLayerById(layer.id.toString()) ?? null;
+    });
+  }
+  gotoItem({ place, imageset });
+}
+
+function onGallerySelect(place: Place) {
+  selectPlace(place);
+  return true; // return true to close the gallery after selections
+}
+
+function onFolderViewSelect({ item }: { item: Thumbnail }) {
+  if (item instanceof Place) {
+    selectPlace(item);
+  }
+}
+
+
 
 import { useTheme, useDisplay } from "vuetify";
 const theme = useTheme();
@@ -462,7 +594,7 @@ import UserExperienceDialog from "./privacy/UserExperienceDialog.vue";
 import { usePrivacy } from "./privacy/usePrivacy";
 import { useUserExperienceRating } from "./privacy/useUserExperienceRating";
 
-// TODO: Suggestion: off-load this to another file
+
 /** app tracking setup */
 const STORY_NAME = "vue-ds-template" as const;
 let appStartTimestamp = Date.now();
@@ -754,11 +886,13 @@ body {
 #wwt-overlay > * {
   // turns each item in #wwt-overlay into a stacking context
   isolation: isolate;
+  > div {
+    background-color: rgba(0, 0, 0, 0.4);
+  }
 }
 
 #top-content {
   width: 100%;
-  pointer-events: auto;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -894,5 +1028,47 @@ body {
   bottom: 3.5rem;
   margin: 0;
   padding: 0;
+}
+
+.gallery-preview {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: scale(1.04);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.6);
+  }
+
+  &.selected {
+    box-shadow: 0 0 0 3px var(--selected-color, dodgerblue);
+  }
+}
+
+.gallery-preview-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gallery-preview-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  padding: 6px 8px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0) 65%);
+}
+
+.gallery-preview-title {
+  color: white;
+  font-size: 10pt;
+  line-height: 1.2;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
 }
 </style>
