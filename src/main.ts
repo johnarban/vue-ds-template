@@ -40,6 +40,9 @@ import hide from "./directives/hide";
 import focusToggle from "./directives/focusToggle";
 import focusGrab from "./directives/focusGrab";
 
+import { addWwtlib } from "./wwt-hacks";
+addWwtlib();
+
 createApp(MainComponent, {
   wwtNamespace: "vue-ds-template",
 })

@@ -13,18 +13,47 @@
         || (hostname.startsWith('10.'))
       )
     })();
+    // make this portable (vite probably has another way to do this)
+    window.runningOnLocalhost = local;
+    window.gtagMeasurementId = 'G-C2ELSYY9VC';
+    // country codes for GDPR consent handling.
+    window.euCountryList = [
+      'AT', 'BE', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR',
+      'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU',
+      'MT', 'NL', 'PT', 'SK', 'SI', 'ES', 'SE', 'GB',
+      'IS', 'LI', 'NO', 'BG', 'PL', 'RO'
+    ];
+  </script>
+  <script>
+    
     if (!local) {
-      const script = document.createElement("script");
-      script.async = true;
-      script.src = "https://www.googletagmanager.com/gtag/js?id=G-C2ELSYY9VC";
-      document.head.appendChild(script);
+      
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
+      // https://developers.google.com/tag-platform/security/guides/consent?consentmode=basic
+      // Region specific behavior
+      // https://developers.google.com/tag-platform/security/guides/consent?consentmode=advanced#region-specific-behavior
+
+      gtag('consent', 'default', {
+        analytics_storage: 'granted',
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+      });
+      // deny everything by default for EU countries
+      gtag('consent', 'default', {
+        analytics_storage: 'denied',
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        region: window.euCountryList
+      });
+
       gtag('js', new Date());
-  
-      gtag('config', 'G-C2ELSYY9VC');
+      gtag('config', window.gtagMeasurementId);
     }
   </script>
+  <!-- loading gtag.js and in src/privacy/useGtagConsent.ts -->
 
   <!-- Declared here once for the whole app rather than in MainComponent's stylesheet, since
        component stylesheets are unscoped and this avoids re-declaring it if that content ever

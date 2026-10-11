@@ -229,7 +229,7 @@
          it can be userful to move complex content into a separate component
          -->
         <tab-page title="User Guide" value="user-guide">
-          <user-guide @change-privacy-settings="showPrivacyDialog = true" />
+          <user-guide @change-privacy-settings="showPrivacyPolicyInfo = true" />
         </tab-page>
       </tabbed-sheet>
 
@@ -256,7 +256,7 @@
           />
         </div>
         <div class="page-sheet-body">
-          <user-guide @change-privacy-settings="showPrivacyDialog = true" />
+          <user-guide @change-privacy-settings="showPrivacyPolicyInfo = true" />
         </div>
       </v-sheet>
       -->
@@ -288,7 +288,8 @@
       :capture-focus="false"
     >
       <CDSPrivacyPolicy
-        v-model="showPrivacyPolicyInfo" 
+        v-model="showPrivacyPolicyInfo"
+        v-model:response-opt-out="responseOptOut"
         v-focus-toggle="showPrivacyDialog"
         tabindex="-1"
       />
@@ -296,7 +297,7 @@
 
     <!-- rating prompt, shown once a while after load (see useUserExperienceRating) -->
     <UserExperienceDialog
-      :show-rating="showRating"
+      :show-rating="showRatingDialog"
       :question="question"
       @dismiss="dismissRating"
       @rating="(rating) => updateUserExperienceInfo(rating, null)"
@@ -326,7 +327,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import type { StyleValue } from "vue";
 import { WWTControl, Coordinates } from "@wwtelescope/engine";
 import { D2R } from "@wwtelescope/astro";
@@ -419,6 +420,10 @@ import CDSPrivacyPolicy from "./privacy/CDSPrivacyPolicy.vue";
 import UserExperienceDialog from "./privacy/UserExperienceDialog.vue";
 import { usePrivacy } from "./privacy/usePrivacy";
 import { useUserExperienceRating } from "./privacy/useUserExperienceRating";
+import { useGtagConsent } from "./privacy/useGtagConsent";
+
+// opt-out by default (US-style); index.html's region-scoped defaults keep EU visitors opted out until they say otherwise
+const _gtagConsent = useGtagConsent(true);
 
 
 /** app tracking setup */
@@ -451,6 +456,14 @@ const {
   getData: getTrackingData,
 });
 
+watch(responseOptOut, (newVal) => {
+  if (newVal === false) {
+    _gtagConsent.value = true;
+  } else if (newVal === true) {
+    _gtagConsent.value = false;
+  }
+});
+
 const {
   showRating,
   question,
@@ -458,7 +471,10 @@ const {
   optOut: optOutRating,
   updateUserExperienceInfo,
   initializePrompt,
-} = useUserExperienceRating(STORY_NAME, userID, { responseOptOut, timeout: 10_000, });
+} = useUserExperienceRating(STORY_NAME, userID, { responseOptOut, timeout: 2_000, });
+
+// rating's timeout runs independently of the splash/privacy dialogs, so gate its visibility on both being done first
+const showRatingDialog = computed(() => showRating.value && !showSplashScreen.value && !showPrivacyDialog.value);
 
 
 const showTour = ref(false);
@@ -793,9 +809,7 @@ body {
   padding: 0 1rem 1rem;
 }
 
-/* make the tour float: pull it out of the drawer (via Teleport) and into
-  #bottom-content, so it lays out in that flex row alongside whatever else
-  is down there (e.g. the crossfade slider) instead of covering it. */
+/* floats the tour: pulled out of the drawer (via Teleport) into #bottom-content's flex row, alongside e.g. the crossfade slider */
 .floating-tour.tour-text {
   flex: 0 1 auto;
   width: 30vw;
