@@ -66,18 +66,16 @@ export function useUserExperienceRating(storyPrefix: string, uuid: MaybeRef<stri
     return response.status === 200 && (content.ratings?.length > 0);
   }
 
-  async function initializePrompt(userExists = false) {
+  async function initializePrompt() {
     if (ratingOptOut.value) {
       return;
     }
 
     let gaveRating = false;
-    if (userExists) {
       try {
         gaveRating = await checkForExistingRating();
       } catch (error) {
         console.error("Error checking if user has given a rating:", error);
-      }
     }
 
     if (!gaveRating) {
