@@ -136,6 +136,7 @@
               :right="jwstCarina.imagesetLayer"
               left-label="Hubble"
               right-label="Webb"
+              @mousedown="opacitySliderUses.increment()"
             />
           </div>
         </div>
@@ -290,6 +291,7 @@
       <CDSPrivacyPolicy
         v-model="showPrivacyPolicyInfo"
         v-model:response-opt-out="responseOptOut"
+        v-model:gtag-consent="gtagConsent"
         v-focus-toggle="showPrivacyDialog"
         tabindex="-1"
       />
@@ -421,23 +423,28 @@ import UserExperienceDialog from "./privacy/UserExperienceDialog.vue";
 import { usePrivacy } from "./privacy/usePrivacy";
 import { useUserExperienceRating } from "./privacy/useUserExperienceRating";
 import { useGtagConsent } from "./privacy/useGtagConsent";
+import { useCounter, useElapsedTime } from "./privacy/useDataCollection";
 
 // opt-out by default (US-style); index.html's region-scoped defaults keep EU visitors opted out until they say otherwise
-const _gtagConsent = useGtagConsent(true);
+const gtagConsent = useGtagConsent(true);
 
 
 /** app tracking setup */
 const STORY_NAME = "vue-ds-template" as const;
-let appStartTimestamp = Date.now();
+const appTime = useElapsedTime(ref(true));
+const opacitySliderUses = useCounter();
 
 function resetTrackingData() {
-  appStartTimestamp = Date.now();
+  appTime.reset();
+  userGuideTime.reset();
+  opacitySliderUses.reset();
 }
 
 function getTrackingData() {
   return {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    app_time_ms: Date.now() - appStartTimestamp,
+    app_time_ms: appTime.current(),
+    user_guide_time_ms: userGuideTime.current(),
+    opacity_slider_use_count: opacitySliderUses.count.value,
   };
 }
 
@@ -458,9 +465,9 @@ const {
 
 watch(responseOptOut, (newVal) => {
   if (newVal === false) {
-    _gtagConsent.value = true;
+    gtagConsent.value = true;
   } else if (newVal === true) {
-    _gtagConsent.value = false;
+    gtagConsent.value = false;
   }
 });
 
@@ -590,6 +597,7 @@ const cssVars = computed(() => {
 */
 const showTextSheet = ref(false);
 const infoSheetTab = ref("");
+const userGuideTime = useElapsedTime(computed(() => showTextSheet.value && infoSheetTab.value === "user-guide"));
 /** open a tab on the info sheet */
 function openInfoSheetTab(tabValue: string) {
   infoSheetTab.value = tabValue;

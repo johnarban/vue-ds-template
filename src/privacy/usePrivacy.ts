@@ -2,12 +2,15 @@ import { ref,  watch} from "vue";
 
 import { useDataTracking, type DataTrackingOptions } from "@cosmicds/vue-toolkit";
 import type { Prettify } from "@/types";
+import type { TrackingData } from "./types";
 
 const PRIVACY_NOTICE_TIMEOUT_MS = 200_000;
 
 export interface UsePrivacyOptions extends DataTrackingOptions {
   /** default 20 seconds */
   privacyNoticeTimeoutMs?: number;
+  /** extend TrackingData per-story for whatever else you track; user_uuid is handled separately */
+  getData: () => Omit<TrackingData, "user_uuid">;
 }
 
 /**

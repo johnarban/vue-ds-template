@@ -63,6 +63,12 @@ export default typescriptEslint.config(
           ],
           format: null,
           modifiers: ["requiresQuotes"]
+        },
+        {
+          // particularly for db things, we need snake case, and this lets you do that without
+          // having to add a disalbe comment. 
+          selector: ["objectLiteralProperty", "typeProperty"],
+          format: null
         }
       ],
       "no-unused-vars": "off",

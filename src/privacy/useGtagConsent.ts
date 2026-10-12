@@ -36,13 +36,9 @@ function loadGtagScript() {
 function updateConsent(granted: boolean) {
   // no `region` here - only documented for 'default', not 'update', which applies to whoever's on the page right now
   gtag("consent", "update", {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     analytics_storage: granted ? "granted" : "denied",
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     ad_storage: "denied",
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     ad_user_data: "denied",
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     ad_personalization: "denied",
   });
 

@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { ref, toValue, watch, type Ref, MaybeRef } from "vue";
 import { API_BASE_URL, type UserExperienceRating } from "@cosmicds/vue-toolkit";
+import type { UserExperienceSubmission } from "./types";
 
 
 export interface UseUserExperienceRatingOptions {
@@ -72,10 +72,10 @@ export function useUserExperienceRating(storyPrefix: string, uuid: MaybeRef<stri
     }
 
     let gaveRating = false;
-      try {
-        gaveRating = await checkForExistingRating();
-      } catch (error) {
-        console.error("Error checking if user has given a rating:", error);
+    try {
+      gaveRating = await checkForExistingRating();
+    } catch (error) {
+      console.error("Error checking if user has given a rating:", error);
     }
 
     if (!gaveRating) {
@@ -99,10 +99,9 @@ export function useUserExperienceRating(storyPrefix: string, uuid: MaybeRef<stri
 
   /** sends the rating/comments without closing the prompt, so a rating given before any comments are typed doesn't get lost */
   async function updateUserExperienceInfo(rating: UserExperienceRating | null, comments: string | null) {
-    const body: Record<string, unknown> = {
+    const body: UserExperienceSubmission = {
       uuid: toValue(uuid),
       question: toValue(question),
-      story_name: storyPrefix,
     };
     if (rating) {
       body.rating = rating;

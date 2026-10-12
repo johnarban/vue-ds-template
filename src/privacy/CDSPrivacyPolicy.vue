@@ -78,6 +78,8 @@
 <script setup lang="ts">
 const showPrivacyDialog = defineModel<boolean>({default: false, required: true});
 const responseOptOut = defineModel<boolean | null>("responseOptOut", {default: null, required: true});
+// for now we are doing nothing with this, 
+// const gaConsent = defineModel<boolean>("gtagConsent", {default: false, required: true});
 
 </script>
 
