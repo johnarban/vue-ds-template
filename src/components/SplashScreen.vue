@@ -76,7 +76,7 @@
 import { computed } from "vue";
 import { FocusTrap } from "focus-trap-vue";
 import { CreditLogos } from "@cosmicds/vue-toolkit";
-import CloseButton from "./CloseButton.vue";
+import { CloseButton } from "@cosmicds/vue-toolkit";
 
 const cfaExtraLogo = [
   {

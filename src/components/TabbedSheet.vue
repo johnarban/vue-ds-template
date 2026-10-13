@@ -112,7 +112,7 @@ export interface Props {
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from "vue";
 import { provide, readonly } from "vue";
-import CloseButton from "./CloseButton.vue";
+import { CloseButton } from "@cosmicds/vue-toolkit";
 
 const props = withDefaults(defineProps<Props>(), {
   closable: true,
