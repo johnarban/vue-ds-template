@@ -16,20 +16,16 @@
       @close="closeSplashScreen"
     >
       <div class="splash-content">
-        <!-- the text styling comes through the a plain p-tag css selector 
-          .splash-lead and .hightlight get larger fonts, and highlight gets accentColor
-          -->
         <p class="splash-lead">Explore</p>
         <p class="highlight">the night sky</p>
         <p>&amp; let it inspire you to dare to do mighty things. it's reading rainbow</p>
       </div>
     </SplashScreen>
     
-    <!-- This dialog contains the video that is displayed when the video icon is clicked -->
     <!-- 
-      passing a youtube url to youtube-src instead will show a youtube video. 
-      pass aspect= "wide" or "vertical" to force 16:9 (wide or vertical) aspect ratio. 
-      -->
+      This dialog contains the video that is displayed when the video icon is clicked 
+      pass `video-src` or `youtube-src` to the VideoWrapper component to show a video.
+    -->
     <VideoWrapper
       v-model="showVideo"
     />
@@ -46,10 +42,6 @@
         
           <div id="top-content">
             <div id="left-buttons">
-              <!-- icon-buttons default to size="1em"
-             id's and classes will be added to the .icon-wrapper
-             it uses slotted styles so it's specificiy is (0,2,0)
-              -->
               <icon-button
                 icon="book-open"
                 aria-label="Learn More"
@@ -386,7 +378,7 @@ useWWTKeyboardControls(store);
 // camera from url //
 // example of loading state.
 import { useUrlState } from "./composables/useUrlState";
-const urlState = useUrlState({ autoUpdate: true, inAddressBar: true, clearOnLoad: false });
+const urlState = useUrlState({ autoUpdate: true, inAddressBar: false, clearOnLoad: true });
 
 // camera position in the url, in degrees. zoom is store.zoomDeg / 6 (vertical FOV convention).
 import { refThrottled } from "@vueuse/core";
@@ -448,9 +440,6 @@ const accentColor2 = computed(() => theme.current.value.colors.secondary);
 
 const { xs } = useDisplay();
 
-// we do not need to add the accent colors anymore since they are availabe via the css theme
-// but we use this to demonstrate the pattern.
-/* This lets us inject component data into element CSS */
 const cssVars = computed(() => {
   return {
     "--accent-color": accentColor.value,
@@ -596,8 +585,6 @@ const tour = useTour<TourStepContent>({
   /**
    be careful if you have multiple moves when your app starts up
    so that they don't conflict with each other.
-   
-   *
    */
   steps: [
     {
@@ -633,18 +620,10 @@ const tour = useTour<TourStepContent>({
 });
 urlState.track("tour", tour.stepID);
 
-// function startTour() {
-//   showTour.value = true;
-// }
 
-// urlState.track("step", tour.stepIndex);
 
-/**
-  Computed flags that control whether the relevant dialogs display.
-  The `sheet` data member stores which sheet is open, so these are just
-  computed wrappers around modifying/querying that which can be used as
-  dialog v-model values
-*/
+// using the navigation drawer layout for multiple things, means
+// it's a bit easier to have a computed combine the logic
 const drawerOpen = computed({
   get: () => !showSplashScreen.value && (showTextSheet.value || showUserGuideSheet.value || (showTour.value && !floatingTour.value)),
   set: (open: boolean) => {
@@ -656,10 +635,11 @@ const drawerOpen = computed({
   },
 });
 
-/**
-  This is convenient if there's any other logic that we want to run
-  when the splash screen is closed
-*/
+import { mutuallyExclusive } from "./composables/utils";
+// only one of the tour, text sheet, and user guide sheet can be open at a time
+mutuallyExclusive(showTour, showTextSheet, showUserGuideSheet);
+
+
 function closeSplashScreen() {
   showSplashScreen.value = false;
   // has the user responsed the opt out, then show the privacy dialog
@@ -667,10 +647,7 @@ function closeSplashScreen() {
   conditionalShowPrivacyDialog();
 }
 
-import { mutuallyExclusive } from "./composables/utils";
 
-// only one of the tour, text sheet, and user guide sheet can be open at a time
-mutuallyExclusive(showTour, showTextSheet, showUserGuideSheet);
 </script>
 
 <style lang="less">
@@ -714,8 +691,6 @@ body {
 
 
 #app {
-  width: 100%;
-  height: 100%;
   margin: 0;
   overflow: hidden;
   overscroll-behavior: none;
@@ -740,11 +715,12 @@ body {
   left: 0;
   bottom: 0;
   right: 0;
+  
+  > canvas {
+    display: block;
+  }
 }
 
-.wwtelescope-component > canvas {
-  display: block;
-}
 
 // #wwt-overlay is positioned against #main-content, not the viewport
 #wwt-overlay {
