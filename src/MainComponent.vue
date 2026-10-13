@@ -330,7 +330,7 @@
 
     <v-slide-y-transition>
       <DataCollectionOptOutFooter
-        v-model:show-privacy-dialog="showDataCollectionOptOut"
+        v-model:show="showDataCollectionOptOut"
         v-model:show-privacy-policy="showPrivacyPolicyInfo"
         v-model:response-opt-out="responseOptOut"
       />
