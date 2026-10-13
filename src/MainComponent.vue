@@ -152,6 +152,15 @@
               @mousedown="opacitySliderUses.increment()"
             />
           </div>
+          
+          <!-- credit logos $logo-credits.cds-bottom-credits -->
+          <credit-logos
+            v-if="!xs"
+            class="cds-bottom-credits"
+            :default-logos="['cosmicds', 'wwt', 'nasa']"
+            :logo-size="xs ? '1.5em' : '2em'"
+            :extra-logos="extraLogos"
+          />
         </div>
       </div>
     </v-main>
@@ -326,19 +335,7 @@
     />
     
     
-    <!-- credit logos $logo-credits.cds-bottom-credits -->
-    <!-- 
-      we want this at the end of the DOM tree so that is last in tab order.
-      but this also means it is highest in z-order, so if it appears on top of 
-      something it should not. give that other thing a higher z-index.
-      -->
-    <credit-logos
-      v-if="!xs"
-      class="cds-bottom-credits"
-      :default-logos="['cosmicds', 'wwt', 'nasa']"
-      :logo-size="xs ? '1.5em' : '2em'"
-      :extra-logos="extraLogos"
-    />
+
     <v-slide-y-transition>
       <DataCollectionOptOutFooter
         v-model:show-privacy-dialog="showDataCollectionOptOut"
@@ -807,8 +804,8 @@ body {
 
 // neither #logo-credits nor #icons-container are flex
 #logo-credits.cds-bottom-credits {
-  position: fixed;
-  bottom: 0.5rem;
+  position: absolute;
+  bottom: 0.25rem;
   right: 0.5rem;
 }
 #logo-credits.cds-bottom-credits > #icons-container {
