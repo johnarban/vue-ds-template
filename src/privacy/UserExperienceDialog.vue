@@ -1,7 +1,25 @@
 <template>
+  <!-- shallow teaser popup: just the question, tapping it brings up the real rating card below -->
+  <AttentionHook
+    class="user-experience-teaser"
+    :visible="showRating && !expanded"
+    :bounce-count="5"
+  >
+    <div
+      class="user-experience-teaser-text"
+      tabindex="0"
+      role="button"
+      :aria-label="question"
+      @click="expanded = true"
+      @keyup.enter="expanded = true"
+    >
+      {{ question }}
+    </div>
+  </AttentionHook>
+
   <v-expand-transition>
     <UserExperience
-      v-if="showRating"
+      v-if="showRating && expanded"
       :question="question"
       icon-size="2x"
       @dismiss="emit('dismiss')"
@@ -35,9 +53,10 @@
 </template>
 
 <script setup lang="ts">
-import { UserExperience, type UserExperienceRating } from "@cosmicds/vue-toolkit";
+import { ref, watch } from "vue";
+import { AttentionHook, UserExperience, type UserExperienceRating } from "@cosmicds/vue-toolkit";
 
-defineProps<{
+const props = defineProps<{
   showRating: boolean;
   question: string;
 }>();
@@ -47,6 +66,12 @@ const emit = defineEmits<{
   (event: "rating", rating: UserExperienceRating | null): void;
   (event: "finish", rating: UserExperienceRating | null, comments: string | null): void;
 }>();
+
+// start back at the teaser each time the prompt is (re)shown
+const expanded = ref(false);
+watch(() => props.showRating, (show) => {
+  if (show) expanded.value = false;
+});
 </script>
 
 <style lang="less">
@@ -123,6 +148,32 @@ const emit = defineEmits<{
     .v-btn--variant-outlined {
       border-color: rgba(var(--v-theme-on-background), .5);
     }
+  }
+}
+
+/* teaser popup: same corner as the full card above, but shallow - just the question */
+.user-experience-teaser.attention-hook {
+  width: auto;
+  height: auto;
+  right: 1em;
+  bottom: -10px;
+  border-radius: 10px;
+  padding: 0.6em 0.9em;
+  padding-bottom: calc(0.3em + 10px);
+  z-index: 9999;
+  background-color: rgba(var(--v-theme-background), 0.95);
+  transition: padding 0.2s ease;
+
+  .user-experience-teaser-text {
+    color: #EFEFEF;
+    font-size: 0.8em;
+    line-height: 1.3;
+    text-align: center;
+    cursor: pointer;
+  }
+  
+  &:hover {
+    padding-bottom: calc(0.3em + 20px);
   }
 }
 </style>
