@@ -106,12 +106,6 @@ watch(() => props.showRating, (show) => {
       display: none;
     }
     
-    .v-btn.close-button {
-      // override position absolute from the toolkit (which is also !important
-      position: static !important;
-      top: unset;
-      right: unset;
-    }
   }
 
   .rating-icon-row {
