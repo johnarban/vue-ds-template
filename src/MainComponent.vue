@@ -620,6 +620,19 @@ const tour = useTour<TourStepContent>({
 });
 urlState.track("tour", tour.stepID);
 
+function startTour() {
+  showTour.value = true;
+  tour.goToStep(tour.stepIndex.value, true);
+}
+
+if (urlState.loadedFromUrl.value.includes("tour")) {
+  startTour();
+}
+watch(showTour, (newVal) => {
+  if (newVal) {
+    startTour();
+  }
+});
 
 
 // using the navigation drawer layout for multiple things, means

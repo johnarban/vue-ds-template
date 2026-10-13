@@ -13,7 +13,7 @@ export interface UseUrlStateOptions {
 export interface UseUrlState {
     track: (key: string, value: Ref) => void;
     getUrl(): string;
-    loadedFromUrl?: Ref<string[]>;
+    loadedFromUrl: Ref<string[]>;
 }
 
 /** 
