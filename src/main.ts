@@ -22,6 +22,8 @@ import {
   faHouse,
   faXmark,
   faImage,
+  faExpand,
+  faCompress,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(faBookOpen);
@@ -35,6 +37,8 @@ library.add(faSignsPost);
 library.add(faHouse);
 library.add(faXmark);
 library.add(faImage);
+library.add(faExpand);
+library.add(faCompress);
 
 import hide from "./directives/hide";
 import focusToggle from "./directives/focusToggle";

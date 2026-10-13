@@ -2,7 +2,7 @@
   <v-app
     id="app"
     :style="cssVars"
-    :class="smallSize ? 'app-is-small' : ''"
+    :class="[smallSize ? 'app-is-small' : '', kiosk ? 'kiosk' : '']"
   >
     <webgl-test @webgl2-disabled="showWebGL2Warning = true" />
     
@@ -104,6 +104,18 @@
             </div>
             <div id="center-buttons"></div>
             <div id="right-buttons">
+              <icon-button
+                v-if="kiosk && !fullscreen"
+                id="fullscreen-icon"
+                :icon="fullscreen ? 'compress' : 'expand'"
+                aria-label="Make fullscreen"
+                :color="accentColor"
+                :focus-color="accentColor"
+                :tooltip-text="`${fullscreen ? 'Exit' : 'Make'} fullscreen`"
+                tooltip-location="start"
+                size="lg"
+                @activate="fullscreen = !fullscreen"
+              />
               <ShareButton
                 :source="urlState.getUrl"
                 :tooltip="false"
@@ -336,6 +348,7 @@ import { D2R } from "@wwtelescope/astro";
 import { GotoRADecZoomParams, WWTComponent as WorldWideTelescope, engineStore } from "@wwtelescope/engine-pinia";
 import {
   useWWTKeyboardControls,
+  useFullscreen,
   IconButton,
   CreditLogos,
   ShareButton,
@@ -391,6 +404,13 @@ const _initialCameraParams = (
 
 const splash = new URLSearchParams(window.location.search).get("splash")?.toLowerCase() !== "false";
 const showSplashScreen = ref(splash);
+
+const kiosk = new URLSearchParams(window.location.search).get("kiosk")?.toLowerCase() === "true";
+if (kiosk) {
+  document.body.classList.add("kiosk");
+}
+
+const fullscreen = useFullscreen();
 
 const showVideo = ref(false);
 
@@ -669,6 +689,13 @@ body {
   overflow: hidden;
 
   font-family: Verdana, Arial, Helvetica, sans-serif;
+
+  &.kiosk {
+    a { // should not be able click on a kiosk
+      pointer-events: none !important;
+      text-decoration: none !important;
+    }
+  }
 }
 
 
