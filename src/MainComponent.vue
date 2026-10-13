@@ -12,6 +12,7 @@
       v-model="showSplashScreen"
       :color="accentColor"
       fullscreen-on-small
+      :disabled="!ready"
       @close="closeSplashScreen"
     >
       <div class="splash-content">

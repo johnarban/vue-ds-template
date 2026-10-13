@@ -29,6 +29,7 @@
             variant="elevated"
             rounded="lg"
             tabindex="0"
+            :disabled="props.disabled"
             @click="closeSplashScreen"
           >
             {{ props.loaded ? "Get Started" : "Loading..." }}
@@ -65,6 +66,7 @@
         <CloseButton
           class="splash-close-button"
           label="Close Splash Screen"
+          :disabled="props.disabled"
           @click="closeSplashScreen"
         />
       </div>
@@ -99,6 +101,8 @@ export interface Props {
   backgroundImage?: string;
   /** hide the built-in "Get Started" button, e.g. when your own slot content has its own CTA */
   hideButton?: boolean;
+  /** disable the close button and "Get Started" button, e.g. while the app isn't ready to be shown yet */
+  disabled?: boolean;
   /** on a small screen ( < 310px wide), cover the
    * whole viewport instead of floating as a bordered card */
   fullscreenOnSmall?: boolean;
@@ -109,6 +113,7 @@ const props = withDefaults(defineProps<Props>(), {
   loaded: true,
   color: "white",
   highlightColor: "white",
+  disabled: false,
 });
 
 const cssVars = computed(() => {
@@ -133,6 +138,7 @@ const showSplashScreen = defineModel<boolean>({ default: true });
 // })
 
 function closeSplashScreen() {
+  if (props.disabled) return;
   showSplashScreen.value = false;
   emits("close");
 }
