@@ -18,7 +18,7 @@ export interface UsePrivacyOptions extends DataTrackingOptions {
  */
 export function usePrivacy(options: Prettify<UsePrivacyOptions>) {
 
-  const showPrivacyDialog = ref(false);
+  const showDataCollectionOptOut = ref(false);
   const showPrivacyPolicyInfo = ref(false);
 
   const { createUserEntry, responseOptOut, userID } = useDataTracking({
@@ -39,14 +39,14 @@ export function usePrivacy(options: Prettify<UsePrivacyOptions>) {
   // when showPrivacyDialog changes, if it is true, 
   // start a timeout to hide it after the specified time. 
   // TODO: if the user clicks to show the Privacy Policy Info, then we should make sure the privacy dialog is not hiddent while it is open and ideally not at all...
-  watch(showPrivacyDialog, (open) => {
+  watch(showDataCollectionOptOut, (open) => {
     if (privacyNoticeTimeout !== null) {
       clearTimeout(privacyNoticeTimeout);
       privacyNoticeTimeout = null;
     }
     if (open) {
       privacyNoticeTimeout = setTimeout(() => {
-        showPrivacyDialog.value = false;
+        showDataCollectionOptOut.value = false;
       }, options.privacyNoticeTimeoutMs ?? PRIVACY_NOTICE_TIMEOUT_MS);
     }
   });
@@ -63,7 +63,7 @@ export function usePrivacy(options: Prettify<UsePrivacyOptions>) {
     const showThisSession = !oncePerSession || !privacyNoticeShown;
     if (responseOptOut.value === null && showThisSession) {
       privacyNoticeShown = true;
-      showPrivacyDialog.value = true;
+      showDataCollectionOptOut.value = true;
     }
   }
   
@@ -71,7 +71,7 @@ export function usePrivacy(options: Prettify<UsePrivacyOptions>) {
     createUserEntry,
     responseOptOut,
     userID,
-    showPrivacyDialog,
+    showDataCollectionOptOut,
     showPrivacyPolicyInfo,
     conditionalShowPrivacyDialog,
   };

@@ -57,7 +57,7 @@ const emit = defineEmits<{
   right: 5px;
   bottom: 5px;
   z-index: 9999;
-  // padding: 1em;
+  padding: 6px 8px;
   // outline: 1px solid rgba(var(--v-theme-on-background), .5) !important;
   // width: fit-content !important;
   // background-color: rgb(var(--v-theme-background)) !important;
@@ -74,6 +74,7 @@ const emit = defineEmits<{
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
     gap: 5px;
     
     .v-spacer {
