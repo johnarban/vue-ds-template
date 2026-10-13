@@ -354,9 +354,6 @@ import {
   ShareButton,
 } from "@cosmicds/vue-toolkit";
 
-import { useAppLayout } from "./composables/useAppLayout";
-import { useWtml } from "./composables/useWtmlLoader";
-
 const extraLogos = [
   {
     src: "./CfA_Logo_Vertical_Reverse.png",
@@ -366,14 +363,21 @@ const extraLogos = [
   },
 ];
 
+// props //
 export interface MainComponentProps {
   wwtNamespace?: string;
 }
 
+withDefaults(defineProps<MainComponentProps>(), {
+  wwtNamespace: "vue-ds-template",
+});
+
+// engine setup //
 const store = engineStore();
 
 useWWTKeyboardControls(store);
 
+// camera from url //
 // example of loading state.
 import { useUrlState } from "./composables/useUrlState";
 const urlState = useUrlState({ autoUpdate: true, inAddressBar: true, clearOnLoad: false });
@@ -387,14 +391,6 @@ urlState.track("ra", raDeg);
 urlState.track("dec", decDeg);
 urlState.track("zoom", zoom);
 
-const { smallSize, sidePanel, floatingPanel: floatingTour, viewportWidth } = useAppLayout();
-const DRAWER_WIDTH_FRACTION = 34; // 34% of the viewport width
-const drawerWidth = computed(() => Math.round(viewportWidth.value * DRAWER_WIDTH_FRACTION / 100.));
-
-withDefaults(defineProps<MainComponentProps>(), {
-  wwtNamespace: "vue-ds-template",
-});
-
 const GALACTIC_CENTER = Coordinates.galactictoJ2000(0, 0);
 const _initialCameraParams = (
   urlState.loadedFromUrl?.value.includes("ra")
@@ -402,9 +398,7 @@ const _initialCameraParams = (
     : { raRad: GALACTIC_CENTER[0] * D2R, decRad: GALACTIC_CENTER[1] * D2R, zoomDeg: 360 }
 ) as Omit<GotoRADecZoomParams, "instant">;
 
-const splash = new URLSearchParams(window.location.search).get("splash")?.toLowerCase() !== "false";
-const showSplashScreen = ref(splash);
-
+// kiosk / fullscreen //
 const kiosk = new URLSearchParams(window.location.search).get("kiosk")?.toLowerCase() === "true";
 if (kiosk) {
   document.body.classList.add("kiosk");
@@ -412,20 +406,31 @@ if (kiosk) {
 
 const fullscreen = useFullscreen();
 
+// ui visibility //
+const splash = new URLSearchParams(window.location.search).get("splash")?.toLowerCase() !== "false";
+const showSplashScreen = ref(splash);
+
 const showVideo = ref(false);
 
 const showWebGL2Warning = ref(false);
 
-const hstCarina = useWtml("https://web.wwtassets.org/specials/2023/cosmicds-carina/collection/carina_nebula.wtml", {
-  single: true,
-  goTo: false,
-});
+const showTextSheet = ref(false);
+const infoSheetTab = ref("");
+const showUserGuideSheet = ref(false);
 
-const jwstCarina = useWtml("https://web.wwtassets.org/specials/2023/cosmicds-carina/collection/jwst_carina.wtml", {
-  single: true,
-  goTo: false,
-});
+/** open a tab on the info sheet */
+function openInfoSheetTab(tabValue: string) {
+  infoSheetTab.value = tabValue;
+  showTextSheet.value = true;
+  // we don't want both open at the same time
+  showUserGuideSheet.value = false;
+}
 
+// styles //
+import { useAppLayout } from "./composables/useAppLayout";
+const { smallSize, sidePanel, floatingPanel: floatingTour, viewportWidth } = useAppLayout();
+const DRAWER_WIDTH_FRACTION = 34; // 34% of the viewport width
+const drawerWidth = computed(() => Math.round(viewportWidth.value * DRAWER_WIDTH_FRACTION / 100.));
 
 import { useTheme, useDisplay } from "vuetify";
 const theme = useTheme();
@@ -437,12 +442,68 @@ const accentColor2 = computed(() => theme.current.value.colors.secondary);
 
 const { xs } = useDisplay();
 
-import { 
-  DataCollectionOptOut, 
-  CDSPrivacyPolicy, 
-  useUserExperienceRating, 
-  useCounter, 
-  useElapsedTime 
+// we do not need to add the accent colors anymore since they are availabe via the css theme
+// but we use this to demonstrate the pattern.
+/* This lets us inject component data into element CSS */
+const cssVars = computed(() => {
+  return {
+    "--accent-color": accentColor.value,
+    "--accent-color-2": accentColor2.value,
+    "--drawer-width": `${DRAWER_WIDTH_FRACTION}vw`,
+    "--drawer-bottom-height": "40vh",
+
+  } as StyleValue;
+});
+
+// loading layers //
+import { useWtml } from "./composables/useWtmlLoader";
+
+const hstCarina = useWtml("https://web.wwtassets.org/specials/2023/cosmicds-carina/collection/carina_nebula.wtml", {
+  single: true,
+  goTo: false,
+});
+
+const jwstCarina = useWtml("https://web.wwtassets.org/specials/2023/cosmicds-carina/collection/jwst_carina.wtml", {
+  single: true,
+  goTo: false,
+});
+
+const layersLoaded = ref(false);
+const positionSet = ref(false);
+const ready = computed(() => layersLoaded.value && positionSet.value);
+
+/* `isLoading` is a bit redundant here, but it could potentially have independent logic */
+const isLoading = computed(() => !ready.value);
+
+onMounted(() => {
+  if (showWebGL2Warning.value) {
+    showSplashScreen.value = false;
+    WWTControl.singleton.canvas.setAttribute("hidden", "true");
+    WWTControl.singleton.renderOneFrame = function () {};
+    return;
+  }
+
+  store.waitForReady().then(async () => {
+    store.gotoRADecZoom({
+      ..._initialCameraParams,
+      instant: true,
+    }).then(() => (positionSet.value = true));
+
+    // wait for all layers to finish loading; add more promises to the array as needed
+    Promise.all([hstCarina.ready, jwstCarina.ready]).then(() => (layersLoaded.value = true));
+
+    createUserEntry();
+    initializePrompt();
+  });
+});
+
+// tracking //
+import {
+  DataCollectionOptOut,
+  CDSPrivacyPolicy,
+  useUserExperienceRating,
+  useCounter,
+  useElapsedTime
 } from "@cosmicds/vue-toolkit";
 import UserExperienceDialog from "./privacy/UserExperienceDialog.vue";
 import { usePrivacy } from "./privacy/usePrivacy";
@@ -451,11 +512,11 @@ import { useGtagConsent } from "./privacy/useGtagConsent";
 // opt-out by default (US-style); index.html's region-scoped defaults keep EU visitors opted out until they say otherwise
 const gtagConsent = useGtagConsent(true);
 
-
 /** app tracking setup */
 const STORY_NAME = "vue-ds-template" as const;
 const appTime = useElapsedTime(ref(true));
 const opacitySliderUses = useCounter();
+const userGuideTime = useElapsedTime(computed(() => showTextSheet.value && infoSheetTab.value === "user-guide"));
 
 function resetTrackingData() {
   appTime.reset();
@@ -506,7 +567,7 @@ const {
 // rating's timeout runs independently of the splash/privacy dialogs, so gate its visibility on both being done first
 const showRatingDialog = computed(() => showRating.value && !showSplashScreen.value && !showPrivacyDialog.value);
 
-
+// tour setup //
 const showTour = ref(false);
 
 import {
@@ -521,13 +582,10 @@ interface TourStepContent extends BaseTourStepContent {
 }
 const tour = useTour<TourStepContent>({
   /**
-   * The first tour step contains a move. In this example file,
-   * we had a move to the galactic center at startup and we had an
-   * imageset layer that we goto. So tour step 1 got clobbered.
-   * You either need to remove those early ones, or else make sure
-   * tour.goToStep(0) get's called after everything is done. but be careful,
-   * putting it in closeSplashScreen only works if the splash screen is shown.
-   * 
+   be careful if you have multiple moves when your app starts up
+   so that they don't conflict with each other.
+   
+   *
    */
   steps: [
     {
@@ -569,67 +627,12 @@ function startTour() {
 
 // urlState.track("step", tour.stepIndex);
 
-
-onMounted(() => {
-  if (showWebGL2Warning.value) {
-    showSplashScreen.value = false;
-    WWTControl.singleton.canvas.setAttribute("hidden", "true");
-    WWTControl.singleton.renderOneFrame = function () {};
-    return;
-  }
-
-  store.waitForReady().then(async () => {
-    store.gotoRADecZoom({
-      ..._initialCameraParams,
-      instant: true,
-    }).then(() => (positionSet.value = true));
-
-    // If there are layers to set up, do that here!
-    layersLoaded.value = true;
-
-    createUserEntry();
-    initializePrompt();
-  });
-});
-
-const layersLoaded = ref(false);
-const positionSet = ref(false);
-const ready = computed(() => layersLoaded.value && positionSet.value);
-
-/* `isLoading` is a bit redundant here, but it could potentially have independent logic */
-const isLoading = computed(() => !ready.value);
-
-// we do not need to add the accent colors anymore since they are availabe via the css theme
-// but we use this to demonstrate the pattern.
-/* This lets us inject component data into element CSS */
-const cssVars = computed(() => {
-  return {
-    "--accent-color": accentColor.value,
-    "--accent-color-2": accentColor2.value,
-    "--drawer-width": `${DRAWER_WIDTH_FRACTION}vw`,
-    "--drawer-bottom-height": "40vh",
-    
-  } as StyleValue;
-});
-
 /**
   Computed flags that control whether the relevant dialogs display.
   The `sheet` data member stores which sheet is open, so these are just
   computed wrappers around modifying/querying that which can be used as
   dialog v-model values
 */
-const showTextSheet = ref(false);
-const infoSheetTab = ref("");
-const userGuideTime = useElapsedTime(computed(() => showTextSheet.value && infoSheetTab.value === "user-guide"));
-/** open a tab on the info sheet */
-function openInfoSheetTab(tabValue: string) {
-  infoSheetTab.value = tabValue;
-  showTextSheet.value = true;
-  // we don't want both open at the same time
-  showUserGuideSheet.value = false;
-}
-const showUserGuideSheet = ref(false);
-
 const drawerOpen = computed({
   get: () => !showSplashScreen.value && (showTextSheet.value || showUserGuideSheet.value || (showTour.value && !floatingTour.value)),
   set: (open: boolean) => {
