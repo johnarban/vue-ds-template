@@ -417,13 +417,16 @@ const accentColor2 = computed(() => theme.current.value.colors.secondary);
 
 const { xs } = useDisplay();
 
-import DataCollectionOptOut from "./privacy/DataCollectionOptOut.vue";
-import CDSPrivacyPolicy from "./privacy/CDSPrivacyPolicy.vue";
+import { 
+  DataCollectionOptOut, 
+  CDSPrivacyPolicy, 
+  useUserExperienceRating, 
+  useCounter, 
+  useElapsedTime 
+} from "@cosmicds/vue-toolkit";
 import UserExperienceDialog from "./privacy/UserExperienceDialog.vue";
 import { usePrivacy } from "./privacy/usePrivacy";
-import { useUserExperienceRating } from "./privacy/useUserExperienceRating";
 import { useGtagConsent } from "./privacy/useGtagConsent";
-import { useCounter, useElapsedTime } from "./privacy/useDataCollection";
 
 // opt-out by default (US-style); index.html's region-scoped defaults keep EU visitors opted out until they say otherwise
 const gtagConsent = useGtagConsent(true);

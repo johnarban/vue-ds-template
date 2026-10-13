@@ -1,8 +1,7 @@
 import { ref,  watch} from "vue";
 
-import { useDataTracking, type DataTrackingOptions } from "@cosmicds/vue-toolkit";
+import { useDataTracking, type DataTrackingOptions, type TrackingData } from "@cosmicds/vue-toolkit";
 import type { Prettify } from "@/types";
-import type { TrackingData } from "./types";
 
 const PRIVACY_NOTICE_TIMEOUT_MS = 200_000;
 
