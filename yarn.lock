@@ -103,8 +103,8 @@ __metadata:
     "@kyvg/vue3-notification": "npm:^2.9.1"
     "@mdi/font": "npm:^7.4.47"
     "@vueuse/core": "npm:^13.1.0"
-    "@wwtelescope/engine": "npm:^7.39.0"
-    "@wwtelescope/engine-pinia": "npm:>=0.15.0 <1.0.0"
+    "@wwtelescope/engine": "npm:^7.41.0"
+    "@wwtelescope/engine-pinia": "npm:^0.17.0"
     leaflet: "npm:^1.9.4"
     pinia: "npm:^2.1.7"
     screenfull: "npm:^6.0.2"
@@ -867,7 +867,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wwtelescope/engine-pinia@npm:>=0.15.0 <1.0.0":
+"@wwtelescope/engine-pinia@npm:^0.17.0":
   version: 0.17.0
   resolution: "@wwtelescope/engine-pinia@npm:0.17.0"
   dependencies:
@@ -888,7 +888,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wwtelescope/engine@npm:^7.39.0, @wwtelescope/engine@npm:^7.41.0":
+"@wwtelescope/engine@npm:^7.41.0":
   version: 7.41.0
   resolution: "@wwtelescope/engine@npm:7.41.0"
   dependencies:
@@ -2411,8 +2411,8 @@ __metadata:
     "@types/node": "npm:^25.9.8"
     "@vitejs/plugin-vue": "npm:^6.0.9"
     "@vueuse/core": "npm:^13.1.0"
-    "@wwtelescope/engine": "npm:^7.39.0"
-    "@wwtelescope/engine-pinia": "npm:>=0.15.0 <1.0.0"
+    "@wwtelescope/engine": "npm:^7.41.0"
+    "@wwtelescope/engine-pinia": "npm:^0.17.0"
     eslint: "npm:^10.11.0"
     eslint-plugin-vue: "npm:^10.11.1"
     eslint-plugin-vuejs-accessibility: "npm:^2.6.0"

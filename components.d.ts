@@ -12,7 +12,6 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     ClosableDialog: typeof import('./src/components/ClosableDialog.vue')['default']
-    ElementTestPage: typeof import('./src/components/ElementTestPage.vue')['default']
     ImageCrossfadeSlider: typeof import('./src/components/ImageCrossfadeSlider.vue')['default']
     Loader: typeof import('./src/components/Loader.vue')['default']
     SplashScreen: typeof import('./src/components/SplashScreen.vue')['default']
