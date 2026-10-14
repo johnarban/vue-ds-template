@@ -220,7 +220,8 @@
         id="side-panel-sheet"
         v-model:tab="infoSheetTab"
         v-focus-toggle="showTextSheet"
-        hide-tabs
+        only-show-one
+        align-tabs="start"
         @close="showTextSheet = false"
       >
         <!-- tab-page content is wrapped in a .tab-page class  -->
@@ -236,7 +237,14 @@
         -->
         <tab-page title="Example" name="example">
           <div class="ip-example-header">[Optional] This will stay at the top</div>
-          <div class="ip-example-body flex-grow-1 overflow-y-auto my-5" />
+          <div class="ip-example-body flex-grow-1 overflow-y-auto my-5">
+            <p  
+              v-for="i in Array(100).fill(0)"
+              :key="i"
+            >
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. 
+            </p>
+          </div>
           <div class="ip-example-footer">This will stay at the bottom</div>
         </tab-page>
 
@@ -872,7 +880,6 @@ body {
 }
 
 .ip-example-body {
-  height: 2000px;
   background: linear-gradient(to bottom, var(--accent-color), var(--accent-color-2));
 }
 
