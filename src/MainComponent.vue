@@ -505,8 +505,8 @@ import {
   DataCollectionOptOutFooter,
   CDSPrivacyPolicy,
   useUserExperienceRating,
-  useCounter,
-  useElapsedTime
+  createTrackingCounter,
+  createTrackingTimer,
 } from "@cosmicds/vue-toolkit";
 import UserExperienceDialog from "./privacy/UserExperienceDialog.vue";
 import { usePrivacy } from "./privacy/usePrivacy";
@@ -517,9 +517,9 @@ const gtagConsent = useGtagConsent(true);
 
 /** app tracking setup */
 const STORY_NAME = "vue-ds-template" as const;
-const appTime = useElapsedTime(ref(true));
-const opacitySliderUses = useCounter();
-const userGuideTime = useElapsedTime(computed(() => showTextSheet.value && infoSheetTab.value === "user-guide"));
+const appTime = createTrackingTimer({active: ref(true)});
+const opacitySliderUses = createTrackingCounter();
+const userGuideTime = createTrackingTimer({active: computed(() => showTextSheet.value && infoSheetTab.value === "user-guide")});
 
 function resetTrackingData() {
   appTime.reset();
@@ -529,8 +529,8 @@ function resetTrackingData() {
 
 function getTrackingData() {
   return {
-    app_time_ms: appTime.current(),
-    user_guide_time_ms: userGuideTime.current(),
+    app_time_ms: appTime.getTotalTime(),
+    user_guide_time_ms: userGuideTime.getTotalTime(),
     opacity_slider_use_count: opacitySliderUses.count.value,
   };
 }
@@ -571,6 +571,7 @@ const {
   questions: [
     "How do you like this app?",
   ],
+  mixin: false,
 });
 
 // rating's timeout runs independently of the splash/privacy dialogs, so gate its visibility on both being done first
